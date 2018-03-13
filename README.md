@@ -1,4 +1,4 @@
 # Cheezoid
-Cheese smelling robot
+Cheese smelling robot, also with petrol detection.
 
 Test edit 2
