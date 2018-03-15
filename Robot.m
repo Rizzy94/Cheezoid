@@ -22,9 +22,9 @@ classdef Robot < handle
         
         %New Variables
         SensorAngle;
-        m1Cal; %Calibration for m1
-        m2Cal; %Calibration for m2
-        m3Cal; %Calibration for m3
+        m1Cal; %Calibration for motor 1
+        m2Cal; %Calibration for motor 2
+        m3Cal; %Calibration for motor 3
     end
     
     methods
