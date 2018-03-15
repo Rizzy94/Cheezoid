@@ -17,24 +17,16 @@ COM_SetDefaultNXT(h);   %sets default handle
 pause(.5)
 
 mAB = NXTMotor('AB', 'Power', wheelPow, 'TachoLimit', wheelDegs);
-%mB = NXTMotor('B', 'Power', wheelPow, 'TachoLimit', wheelDegs);
 mAB.SpeedRegulation = false;
-%MB.SpeedRegulation = false;
 mAB.SmoothStart = true;
-%MB.SmoothStart = true;
 
 dists = zeros(numTrials, 1);
 
 for i = 1:numTrials
     
     mAB.SendToNXT();
-    %mB.SendToNXT();
-    
     mAB.WaitFor();
-    
     mAB.Stop('brake') 
-    %mB.Stop('brake')
-
     dists(i) = input(['How many cm did the robot move?' newline]);
 
 end
