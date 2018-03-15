@@ -1,4 +1,4 @@
-classdef Robot
+classdef Robot < handle
     %ROBOT class for controlling NXT mindstorm robot.
     
     properties
