@@ -65,8 +65,8 @@ while(converged == 0 && n < maxIterations) %%particle filter loop
         
         %NEW: after ultraScan we'll scatter the particles a little bit,
         %probs wont work
-        particles(i).setBotPos( particles(i).getBotPos() + 3*randn(1,2) )
-        particles(i).setBotAng( particles(i).getBotAng() + 10*randn )
+        %particles(i).setBotPos( particles(i).getBotPos() + 3*randn(1,2) )
+        %particles(i).setBotAng( particles(i).getBotAng() + *randn )
         
         disparity = mean(abs(distances(:,i) - botScan)); 
         particleProbs(i) = exp(-(disparity^2 / (2 * sensorNoise))) + dampeningFact;
