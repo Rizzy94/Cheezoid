@@ -52,7 +52,7 @@ mC.TachoLimit = 360; %in degrees
 mC.SendToNXT(); 
 
 %% Compose a comand:
-mC = NXTMotor('C', 'Power', -60, 'TachoLimit', 720); % two turns with speed 60, use +/- values to alter direction
+mC = NXTMotor('C', 'Power', -60, 'TachoLimit', -720); % two turns with speed 60, use +/- values to alter direction
 mC.SendToNXT(); 
 
 %% To ensure two successive commands are performed use WaitFor()

@@ -43,14 +43,10 @@ classdef Robot < handle
         
         
         function beep(nxt, hz, ms)
-            NXT_PlayTone(hz, ms);
+            NXT_PlayTone(hz, 500);
         end
-        function dist = scan(nxt, num)
-            dist = zeros(num, 1);
-            for i = 1:num
-                dist(i) = GetUltrasonic(SENSOR_1);
-                pause(0.1);
-            end
+        function dist = scan(nxt)
+            dist = GetUltrasonic(SENSOR_1);
         end
     end
     
