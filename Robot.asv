@@ -73,7 +73,7 @@ classdef Robot < handle
         
         %rotating scan
         function scan = rotScan(nxt, numScans)   
-            initPos = nxt.posC;
+            initPos =
             turnPow = nxt.pUltra * (-sign(nxt.posC));
             mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', 360);
             mC.SpeedRegulation = false;
@@ -84,7 +84,7 @@ classdef Robot < handle
             posC = datC.Position;
             mC.SendToNXT();
             scan(1) = GetUltrasonic(SENSOR_1);
-            magPos = (posC - initPos)
+            
             while ((datC.IsRunning == 1) || (scanCount == 1) )
                 if (abs(posC)) > scanCount*(360/numScans)
                     scanCount = scanCount +  1;

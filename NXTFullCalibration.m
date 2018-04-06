@@ -15,7 +15,8 @@ end
 
 pause(.5)
 
-mAB = NXTMotor('AB', 'Power', wheelPowMove, 'TachoLimit', wheelDegsMove);
+mAB = NXTMotor('AB', 'Power', 
+wheelPowMove, 'TachoLimit', wheelDegsMove);
 mAB.SpeedRegulation = false;
 mAB.SmoothStart = true;
 
