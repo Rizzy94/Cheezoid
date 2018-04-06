@@ -1,7 +1,7 @@
 function NXTTurn (howTurned, degPerDeg, turnPow)
 
-mA = NXTMotor('A', 'Power', turnPow, 'TachoLimit', round(howTurned/degPerDeg));
-mB = NXTMotor('B', 'Power', -turnPow, 'TachoLimit', round(howTurned/degPerDeg));
+mA = NXTMotor('A', 'Power', turnPow, 'TachoLimit', round((howTurned*180/pi)/degPerDeg));
+mB = NXTMotor('B', 'Power', -turnPow, 'TachoLimit', round((howTurned*180/pi)/degPerDeg));
 mB.SpeedRegulation = false;
 mB.SmoothStart = true;
 mA.SpeedRegulation = false;

@@ -56,7 +56,7 @@ particlePositions = zeros(round(numParticles*redistPercentage),2);
 while(converged == 0 && n < maxIterations) %%particle filter loop
     
     n = n+1; %increment the current number of iterations
-    botScan = NXTUltraScan(samples, round(360/degPerDeg), 'Left', robotMotorPow); %get a scan from the real robot.
+    botScan = NXTUltraScan2(72, 30); %get a scan from the real robot.
 
     for i = 1:numParticles
         rawScan = particles(i).ultraScan(); %get a scan from the particles
