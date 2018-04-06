@@ -5,15 +5,25 @@ clear all;      %clears workspace
 nxt = Robot(); %creates robot object
 nxt.beep(440, 200);
 
-%% scan
-scansA = nxt.rotScan(10,80)
-pause(1)
-scansB = nxt.rotScan(10,80)
-%% plotting
-numScans = size(scansA, 1);
-polarplot(linspace(0,2*pi,numScans),scansA(:,1), '-*')
-hold on
-polarplot(linspace(0,2*pi,numScans),scansB(:,1), '-*')
-hold off
-%% exit
+%try block means the robot will always be able to exit (nxt.close()) if there is an
+%error in the code
+try
+    %% scan
+    scansA = nxt.rotScan(30,80);
+    pause(1)
+    scansB = nxt.rotScan(30,80);
+    scansC = flip(scansB);
+    %% plotting
+    numScans = size(scansA, 1);
+    polarplot(linspace(0,2*pi,numScans),scansA(:,1), '-*')
+    hold on
+
+    %polarplot(linspace(0,2*pi,numScans),scansB(:,1), '-*')
+    polarplot(linspace(0,2*pi,numScans),scansC(:,1), '-*')
+
+    hold off
+catch ME
+    warning('There was an error. Closing Robot Connection')
+    ME %print the error message
+end
 nxt.close();

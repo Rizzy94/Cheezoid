@@ -14,8 +14,6 @@ classdef Robot < handle
         scanLines;      %the scan configuration stored as 2d lines
         sl;
         sensorNoise;     %how much noise to add to a scan. Constant noise model. Error standard deviation in cm
-        motionNoise;     %how much noise when moving. Proportional noise model. cm error stdDev per unit length in cm/cm
-        turningNoise;    %how much noise when turning. Porportional noise model. Radian stdDev error per radian rad/rad
         adminKey;       %the key to lock off certain features
         PosHistory;  %stores history of where the robot has been
         MoveCount;
@@ -27,13 +25,23 @@ classdef Robot < handle
         m1Cal; %Calibration for motor 1
         m2Cal; %Calibration for motor 2
         m3Cal; %Calibration for motor 3
+        
+        %Callibration Variables
+        cmPerDeg = 0.0361;
+        degPerDeg = 0.2067;
+        motionNoise = 0.9083;
+        turningNoise = 12.2474;
+        
+        %power variables
+        pUltra = 70;    %ultra scanner power
+        pTurn = 70;     %turning power
+        pMove = 70;     %moving power
     end
     
     methods
         %set up robot, called on initiating class
         function nxt = Robot()
             COM_CloseNXT all;  
-            %COM_CloseNXT('all');
             h = COM_OpenNXT();      %look for USB devices
             COM_SetDefaultNXT(h);   %sets default handle
             OpenUltrasonic(SENSOR_1); %opens ultrasound connection
@@ -60,9 +68,9 @@ classdef Robot < handle
         end
         
         %rotating scan
-        function scan = rotScan(nxt, numScans, turnPow)
-            turnPow = turnPow * nxt.wireTwist;
-            scan = zeros(numScans, 2);
+        function scan = rotScan(nxt, numScans)
+            turnPow = nxt.pUltra * nxt.wireTwist;
+            scan = zeros(numScans, 1);
             mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', 360);
             %OpenUltrasonic(SENSOR_1);
             mC.SpeedRegulation = false;
@@ -72,23 +80,65 @@ classdef Robot < handle
             datC = mC.ReadFromNXT();
             posC = datC.Position;
             mC.SendToNXT();
-            scan(1,1) = GetUltrasonic(SENSOR_1);
-            scan(1,2) = posC;
+            scan(1) = GetUltrasonic(SENSOR_1);
             scanCount = 1;
 
             while ((datC.IsRunning == 1) || (scanCount == 1) )
                 if (abs(posC)) > scanCount*(360/numScans)
                     scanCount = scanCount +  1;
-                    scan(min(scanCount, numScans),1) = GetUltrasonic(SENSOR_1);
-                    scan(min(scanCount, numScans),2) = posC;
+                    scan(min(scanCount, numScans)) = GetUltrasonic(SENSOR_1);
                 end
                 datC = mC.ReadFromNXT();
                 posC = datC.Position;
             end
 
             mC.WaitFor();
+            %switch the 2nd to end scan array, if counter-rotating
+            if sign(nxt.wireTwist)<0
+                scan(2:end) = flip(scan(2:end)); 
+            end
+
             nxt.wireTwist = - nxt.wireTwist;
         end
+        
+        %turn
+        function turn(nxt, angle)
+            turnPow = nxt.pTurn * sign(angle);
+            angle = abs(angle);
+            mA = NXTMotor('A', 'Power', turnPow, 'TachoLimit', round(angle/nxt.degPerDeg));
+            mB = NXTMotor('B', 'Power', -turnPow, 'TachoLimit', round(angle/nxt.degPerDeg));
+            mB.SpeedRegulation = false;
+            mB.SmoothStart = true;
+            mA.SpeedRegulation = false;
+            mA.SmoothStart = true;
+
+            mA.SendToNXT();
+            mB.SendToNXT();
+            mA.WaitFor();
+            mB.WaitFor();
+            mA.Stop('brake') 
+            mB.Stop('brake') 
+
+        end
+        
+        %move
+        function move(nxt, howFar)
+            %allow for backwards movements
+            movePow = nxt.pMove * sign(howFar);
+            howFar = abs(howFar);
+            %run the motors
+            mAB = NXTMotor('AB', 'Power', movePow, 'TachoLimit', round(howFar/nxt.cmPerDeg));
+            mAB.SpeedRegulation = false;
+            mAB.SmoothStart = true;
+            mAB.SendToNXT();
+            mAB.WaitFor();
+            mAB.Stop('brake') 
+        end
+        
+        %callibrate TODO: store this data in a callibration .txt/.csv/.mat
+        function callibrate(nxt)
+        end
+  
     end
     
 end
