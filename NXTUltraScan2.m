@@ -1,7 +1,7 @@
 function [scan] = NXTUltraScan2(numScans, turnPow)
 %NXTUltraScan2(72, 20);
 
-% COM_CloseNXT all        %prepares workspace
+% COM_CloseNXT all;        %prepares workspace
 % h = COM_OpenNXT();      %look for USB devices
 % COM_SetDefaultNXT(h);   %sets default handle
 % pause(1)
