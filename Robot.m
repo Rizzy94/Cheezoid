@@ -72,11 +72,10 @@ classdef Robot < handle
             turnPow = nxt.pUltra * nxt.wireTwist;
             scan = zeros(numScans, 1);
             mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', 360);
-            %OpenUltrasonic(SENSOR_1);
             mC.SpeedRegulation = false;
             mC.SmoothStart = false;
             mC.ResetPosition(); 
-            pause(.5);
+            pause(.5); %why is this pause here, can it be shorter?
             datC = mC.ReadFromNXT();
             posC = datC.Position;
             mC.SendToNXT();
@@ -103,6 +102,8 @@ classdef Robot < handle
         
         %turn
         function turn(nxt, angle)
+            %convert radian input to degrees
+            angle = rad2deg(angle);
             turnPow = nxt.pTurn * sign(angle);
             angle = abs(angle);
             mA = NXTMotor('A', 'Power', turnPow, 'TachoLimit', round(angle/nxt.degPerDeg));
@@ -137,6 +138,7 @@ classdef Robot < handle
         
         %callibrate TODO: store this data in a callibration .txt/.csv/.mat
         function callibrate(nxt)
+            
         end
   
     end
