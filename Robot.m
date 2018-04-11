@@ -39,7 +39,8 @@ classdef Robot < handle
         
         %pos of the ultrascanner
         posC;
-        scanOffset = -20;
+        datC;
+        scanOffset = 20;
     end
     
     methods
@@ -72,47 +73,77 @@ classdef Robot < handle
         end
         
         %rotating scan
-        function scan = rotScan(nxt, numScans)   
-            initPos = nxt.posC;
-            turnPow = nxt.pUltra * (-sign(nxt.posC));
-            mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', 360);
+        function scan = rotScan(nxt, numScans) 
+            scan = zeros(numScans,1);
+            initPos = nxt.sensorAngle();
+            turnPow = nxt.pUltra * (-sign(initPos));
+            
+            mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', 400); %make this so it moves to a set position
             mC.SpeedRegulation = false;
             mC.SmoothStart = false;
-            mC.ResetPosition(); 
             pause(.5); %why is this pause here, can it be shorter?
-            datC = mC.ReadFromNXT();
-            posC = datC.Position;
+
             mC.SendToNXT();
-            scan(1) = GetUltrasonic(SENSOR_1);
-            magPos = (posC - initPos)
-            while ((datC.IsRunning == 1) || (scanCount == 1) )
-                if (abs(posC)) > scanCount*(360/numScans)
-                    scanCount = scanCount +  1;
-                    scan(min(scanCount, numScans)) = GetUltrasonic(SENSOR_1);
+            scanCount = 0;
+            if sign(initPos)<0 %Clockwise Scan
+                while nxt.datC.IsRunning || scanCount<numScans-1
+                     nxt.sensorAngle();
+                     if nxt.posC >= scanCount*(360/numScans) && nxt.posC < 360
+                        scanCount = scanCount + 1;
+                        scan(scanCount) = GetUltrasonic(SENSOR_1);
+%                         scan(scanCount, 2) = nxt.posC;
+
+                     end
+
                 end
-                datC = mC.ReadFromNXT();
-                posC = datC.Position;
             end
+            
+            if sign(initPos)>0 %Anti clockwise Scan
+                while nxt.datC.IsRunning || scanCount<numScans-1
+                     nxt.sensorAngle();
+                     if nxt.posC <= 360 - scanCount*(360/numScans) && nxt.posC > 0
+                        scanCount = scanCount + 1;
+                        scan(scanCount) = GetUltrasonic(SENSOR_1);
+%                         scan(scanCount, 2) = nxt.posC;
+
+                     end
+                scan(2:end) = flip(scan(2:end));
+                end
+                
+            end
+       
             
             mC.WaitFor();
             %switch the 2nd to end scan array, if counter-rotating
-            if sign(nxt.wireTwist)<0
-                scan(2:end) = flip(scan(2:end)); 
-            end
-
-            nxt.wireTwist = - nxt.wireTwist;
+%             if sign(nxt.wireTwist)<0
+%                  
+%             end
+% 
+%             nxt.wireTwist = - nxt.wireTwist;
         end
         
+        
         function setUpScanner(nxt)
-            mC = NXTMotor('C', 'Power', nxt.pUltra, 'TachoLimit', scanOffset);
+            turnPow = nxt.pUltra * -sign(nxt.scanOffset);
+            mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', abs(nxt.scanOffset));
             mC.SpeedRegulation = false;
             mC.SmoothStart = false;
             mC.ResetPosition();
             mC.SendToNXT();
             mC.WaitFor();
-            datC = mC.ReadFromNXT();
-            nxt.posC = datC.Position;
+            nxt.datC = mC.ReadFromNXT();
+            nxt.posC = nxt.datC.Position;
+            pause(0.4)
         end
+            
+        function angle = sensorAngle(nxt)
+            mC = NXTMotor('C');
+            nxt.datC = mC.ReadFromNXT();
+            nxt.posC = nxt.datC.Position;
+            angle = nxt.posC;            
+        end
+        
+
         
         %turn
         function turn(nxt, angle)
