@@ -10,14 +10,15 @@ nxt.beep(440, 200); %Beep beep
 try
     nxt.setUpScanner();
     nxt.sensorAngle()
-    numScans = 72;
-    scanA = nxt.rotScan(numScans)
-    scanB = nxt.rotScan(numScans)
-    polarplot(linspace(0,2*pi,numScans),scanA(:,1), '-*')
-    hold on
-    polarplot(linspace(0,2*pi,numScans),scanB(:,1), '-*')
-    legend('scan1', 'scan2');
-    hold off
+    nxt.callibrate(3)
+numScans = 72
+scanA = nxt.rotScan(numScans)
+scanB = nxt.rotScan(numScans)
+polarplot(linspace(0,2*pi,numScans),scanA(:,1), '-*')
+hold on
+polarplot(linspace(0,2*pi,numScans),scanB(:,1), '-*')
+legend('scan1', 'scan2');
+hold off
 catch ME
     warning('There was an error. Closing Robot Connection')
     display(ME.message) %print the error message

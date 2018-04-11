@@ -27,14 +27,13 @@ classdef Robot < handle
         m3Cal; %Calibration for motor 3
         
         %Callibration Variables
-        cmPerDeg = 0.0361;
-        degPerDeg = 0.2067;
-        motionNoise = 0.9083;
-        turningNoise = 12.2474;
-        
+        cmPerDeg;
+        degPerDeg;
+        motionNoise;
+        turningNoise;
         %power variables
-        pUltra = 70;    %ultra scanner power
-        pTurn = 70;     %turning power
+        pUltra = 60;    %ultra scanner power
+        pTurn = 30;     %turning power
         pMove = 70;     %moving power
         
         %pos of the ultrascanner
@@ -50,6 +49,17 @@ classdef Robot < handle
             h = COM_OpenNXT();      %look for USB devices
             COM_SetDefaultNXT(h);   %sets default handle
             OpenUltrasonic(SENSOR_1); %opens ultrasound connection
+            calVars = load('callibration', 'cmPerDeg' , 'degPerDeg', 'motionNoise', 'turningNoise');
+            nxt.loadCallibration()
+        end
+        
+        %load callibration variables from 'callibration.mat'
+        function loadCallibration(nxt)
+            calVars = load('callibration', 'cmPerDeg' , 'degPerDeg', 'motionNoise', 'turningNoise');
+            nxt.cmPerDeg = calVars.cmPerDeg;
+            nxt.degPerDeg = calVars.degPerDeg;
+            nxt.motionNoise = calVars.motionNoise;
+            nxt.turningNoise = calVars.turningNoise;
         end
         
         %safely exit NXT
@@ -182,8 +192,91 @@ classdef Robot < handle
         end
         
         %callibrate TODO: store this data in a callibration .txt/.csv/.mat
-        function callibrate(nxt)
+        function callibrate(nxt, numTrials)
+            wheelDegsMove = 400;
+            wheelDegsTurn = 200;
+            ready = 'NoGo';
+
+            while strcmp(ready,'GO') == 0
+                ready = input(['Type GO when you are ready to measure robot forward movement' newline], 's');
+            end
             
+            pause(.5)
+            mAB = NXTMotor('AB', 'Power', nxt.pMove, 'TachoLimit', wheelDegsMove);
+            mAB.SpeedRegulation = false;
+            mAB.SmoothStart = true;
+
+            dists = zeros(numTrials, 1);
+
+            for i = 1:numTrials
+                mAB.SendToNXT();
+                mAB.WaitFor();
+                mAB.Stop('brake') 
+                dists(i) = input(['How many cm did the robot move?' newline]);
+            end
+
+            cmPerDeg = mean(dists) / wheelDegsMove;
+            motionNoise = std(dists);
+
+            sprintf('This robot moves %d cm per 1 degree of wheel rotation.' , cmPerDeg)
+            disp(newline)
+            sprintf('This robot has approximately %d movementNoise.' , motionNoise)
+            disp(newline)
+
+            %% Angular Calibration
+
+            ready = 'NoGo';
+
+            while strcmp(ready,'GO') == 0
+                ready = input(['Type GO when you are ready to measure robot turning movement' newline], 's');
+            end
+
+            mA = NXTMotor('A', 'Power', nxt.pTurn, 'TachoLimit', wheelDegsTurn);
+            mB = NXTMotor('B', 'Power', -nxt.pTurn, 'TachoLimit', wheelDegsTurn);
+            mA.SpeedRegulation = false;
+            mB.SpeedRegulation = false;
+            mA.SmoothStart = true;
+            mB.SmoothStart = true;
+
+            angs = zeros(numTrials, 1);
+
+            for i = 1:numTrials
+
+                mA.SendToNXT();
+                mB.SendToNXT();
+
+                mA.WaitFor();
+                mB.WaitFor();
+
+                mA.Stop('brake') 
+                mB.Stop('brake')
+
+                angs(i) = input(['How much did it turn in degrees?' newline]);
+
+            end
+
+            degPerDeg = mean(angs) / wheelDegsTurn;
+            turningNoise = std(angs);
+
+            sprintf('This robot turns %d degs per 1 degree of wheel rotations.' , degPerDeg)
+            disp(newline)
+            sprintf('This robot has approximately %d turningNoise.' , turningNoise)
+            disp(newline)
+            disp('Variables to save: ')
+            sprintf('cmPerDeg: %d' , cmPerDeg)
+            sprintf('motionNoise: %d' , motionNoise)
+            sprintf('degPerDeg: %d' , degPerDeg)
+            sprintf('turningNoise: %d' , turningNoise)
+            
+            userInput = input('Do you want to save to callibration.mat? (yes/no) ==> ', 's');
+            if strcmp(userInput,'yes')
+                save('callibration.mat', 'cmPerDeg' , 'degPerDeg', 'motionNoise', 'turningNoise');
+                nxt.loadCallibration();
+            else
+                  warning('Input not equal to "yes". Callibration variables will not be saved')
+            end
+            
+
         end
   
     end
