@@ -19,3 +19,15 @@ By about 15 degrees
 - 270 is to the left
 - 90 is to the right
 - 180 is behind
+
+
+Plan:
+
+- Make a scan interpretter from the raw data
+
+
+Maybe:
+
+Rather than just doing plain angles.
+Identify where features are for sure.
+Then work on botSim with those.
