@@ -73,12 +73,12 @@ classdef Robot < handle
         end
         
         %beep boop, takes frequency and time in ms
-        function beep(nxt, hz, ms)
+        function beep(~, hz, ms)
             NXT_PlayTone(hz, ms);
         end
         
         %forward scan
-        function dist = scan(nxt, num)
+        function dist = scan(~, num)
             dist = zeros(num, 1);
             for i = 1:num
                 dist(i) = GetUltrasonic(SENSOR_1);
@@ -88,7 +88,7 @@ classdef Robot < handle
         
         %rotating scan
         function scan = rotScan(nxt, numScans) 
-            scan = zeros(numScans,1);
+            scan = zeros(numScans,2);
             initPos = nxt.sensorAngle();
             turnPow = nxt.pUltra * (-sign(initPos));
             
@@ -104,9 +104,8 @@ classdef Robot < handle
                      nxt.sensorAngle();
                      if nxt.posC >= scanCount*(360/numScans) && nxt.posC < 360
                         scanCount = scanCount + 1;
-                        scan(scanCount) = GetUltrasonic(SENSOR_1);
-%                         scan(scanCount, 2) = nxt.posC;
-
+                        scan(scanCount, 1) = GetUltrasonic(SENSOR_1);
+                        scan(scanCount, 2) = nxt.posC;
                      end
 
                 end
@@ -117,17 +116,14 @@ classdef Robot < handle
                      nxt.sensorAngle();
                      if nxt.posC <= 360 - scanCount*(360/numScans) && nxt.posC > 0
                         scanCount = scanCount + 1;
-                        scan(scanCount) = GetUltrasonic(SENSOR_1);
-                        if scan(scanCount)==0
-                            pause(0.04)
-                            scan(scanCount) = GetUltrasonic(SENSOR_1);
-                        end
-%                         scan(scanCount, 2) = nxt.posC;
-
+                        scan(scanCount, 1) = GetUltrasonic(SENSOR_1);
+                        scan(scanCount, 2) = nxt.posC;
                      end
-                scan(2:end) = flip(scan(2:end));
+
+                     
+%                 scan(2:end) = flip(scan(2:end));
                 end
-                
+                scan(:,2) = wrapTo360(scan(:,2)+20);
             end
        
             

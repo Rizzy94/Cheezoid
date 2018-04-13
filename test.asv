@@ -30,15 +30,15 @@ try
 %     legend('scan1', 'scan2');
 %     hold off
     figure
-    plot(scanA(:,2), scanA(:,1), '.');
+    plot(scanA(:,2), scanA(:,1), 'r.');
     hold on
-    plot(scanB(:,2), scanB(:,1), '.');
-    plot(scanC(:,2), scanC(:,1), '.');
-    plot(scanD(:,2), scanD(:,1), '.');
-    plot(scanE(:,2), scanE(:,1), '.');
-    plot(scanF(:,2), scanF(:,1), '.');
-    hold off
-    legend('scanA', 'scanB', 'scanC', 'scanD', 'scanE', 'scanF');
+    plot(scanB(:,2), scanB(:,1), 'b.');
+    plot(scanC(:,2), scanC(:,1), 'r.');
+    plot(scanD(:,2), scanD(:,1), 'b.');
+    plot(scanE(:,2), scanE(:,1), 'r.');
+    plot(scanF(:,2), scanF(:,1), 'b.');
+%     hold off
+%     legend('scan1', 'scan2', 'scan3', 'scan4', 'scan5', 'scan6');
 %     mario(nxt)
 catch ME
     warning('There was an error. Closing Robot Connection')
