@@ -52,7 +52,7 @@ classdef Robot < handle
             calVars = load('callibration', 'cmPerDeg' , 'degPerDeg', 'motionNoise', 'turningNoise');
             nxt.loadCallibration()
             OpenUltrasonic(SENSOR_1);
-            nxt.setUpScanner(1)
+
         end
         
         %load callibration variables from 'callibration.mat'
@@ -67,9 +67,7 @@ classdef Robot < handle
         %safely exit NXT
         function close(nxt)
            pause(.5)
-           nxt.setUpScanner(0)
            COM_CloseNXT all;
-           
         end
         
         %beep boop, takes frequency and time in ms
@@ -137,11 +135,8 @@ classdef Robot < handle
         
         
         function setUpScanner(nxt, initial)
-            if initial == 1
-                turnPow = nxt.pUltra * -sign(nxt.scanOffset);
-            else
-                turnPow = nxt.pUltra * sign(nxt.scanOffset);
-            end
+            if 
+            turnPow = nxt.pUltra * -sign(nxt.scanOffset);
             mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', abs(nxt.scanOffset));
             mC.SpeedRegulation = false;
             mC.SmoothStart = false;
