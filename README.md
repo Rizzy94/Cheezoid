@@ -31,3 +31,13 @@ Maybe:
 Rather than just doing plain angles.
 Identify where features are for sure.
 Then work on botSim with those.
+
+
+ToDo:
+
+NXTlocalise with new functions.
+Finish Scan clear and make that align with the botscans
+Make robot.m inherit from BotSim()
+Update pathplanning functions to work with nxt.
+Make move function detect actual velocity with forwardScan()
+
