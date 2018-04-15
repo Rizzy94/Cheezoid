@@ -71,7 +71,7 @@ classdef Robot < handle
         function scan = rotScan(nxt, numScans)
             turnPow = nxt.pUltra * nxt.wireTwist;
             scan = zeros(numScans, 1);
-            mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', 360);
+            mC = NXTMotor('C', 'Power', -turnPow, 'TachoLimit', 360);
             mC.SpeedRegulation = false;
             mC.SmoothStart = false;
             mC.ResetPosition(); 
@@ -91,13 +91,20 @@ classdef Robot < handle
                 posC = datC.Position;
             end
 
+%             if sign(nxt.wireTwist)<0
+%                 scan(2:end) = flip(scan(2:end)); 
+%             end
+            nxt.wireTwist = - nxt.wireTwist;
+            
             mC.WaitFor();
             %switch the 2nd to end scan array, if counter-rotating
-            if sign(nxt.wireTwist)<0
-                scan(2:end) = flip(scan(2:end)); 
-            end
-
+            mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', 360);
+            mC.SpeedRegulation = false;
+            mC.SmoothStart = false;
+            mC.SendToNXT();
+            mC.WaitFor();
             nxt.wireTwist = - nxt.wireTwist;
+            
         end
         
         %turn

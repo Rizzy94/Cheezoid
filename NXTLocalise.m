@@ -1,14 +1,14 @@
-[cmPerDeg, movementNoise, degPerDeg, turningNoise] = NXTFullCalibration(1, 500, 50, 1500, 50);
+%[cmPerDeg, movementNoise, degPerDeg, turningNoise] = NXTFullCalibration(1, 500, 50, 1500, 50);
 % cmPerDeg = 
 % movementNoise =
 % degPerDeg = 
 % turningNoise = 
 
-map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
+rawMap = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 target = [80,80];
 
 startAngle =0;    
-samples = 72;
+samples = 30;
 endAngle = ((samples-1)*2*pi)/samples;  
 angles = (startAngle:(endAngle - startAngle)/(samples-1):endAngle);
 scanLines =  [cos(angles); sin(angles)]'*100;
@@ -19,7 +19,10 @@ redistPercentage = 0.95;
 maxIterations = 25;
 sensorNoise = 1;    %UK
 
-robotMotorPow = 50;
+nxt = Robot(); %creates robot object
+nxt.beep(440, 200); %Beep beep
+
+robotMotorPow = nxt.pUltra;
 
 numParticles = 500; 
 plotMe = true;
@@ -56,7 +59,7 @@ particlePositions = zeros(round(numParticles*redistPercentage),2);
 while(converged == 0 && n < maxIterations) %%particle filter loop
     
     n = n+1; %increment the current number of iterations
-    botScan = NXTUltraScan2(72, 30); %get a scan from the real robot.
+    botScan = nxt.rotScan(samples); %get a scan from the real robot.
 
     for i = 1:numParticles
         rawScan = particles(i).ultraScan(); %get a scan from the particles
@@ -126,8 +129,9 @@ while(converged == 0 && n < maxIterations) %%particle filter loop
     
     %turn = 0.5;
     if n == 0 || botScan(1) <= 30
-        auxVar = scanLines(botScan == max(botScan),:);
-        turn = atan2(auxVar(1,2), auxVar(1,1));
+        foundPath = false; numTries = 0;
+        auxVar = scanLines(botScan == max(botScan),:);  %gets a direction vector with the longest scan ditance
+        turn = atan2(auxVar(1,2), auxVar(1,1));         % uses atan2 on this vector to get angle to turn
     else
         turn = 0;
     end
@@ -135,8 +139,8 @@ while(converged == 0 && n < maxIterations) %%particle filter loop
     move = 10;   %4
     
     if converged == 0
-        NXTTurn(turn, degPerDeg, robotMotorPow); %turn the real robot.  
-        NXTMove(move, cmPerDeg, robotMotorPow); %move the real robot. 
+        nxt.turn(turn); %turn the real robot.  
+        nxt.move(move); %move the real robot. 
         for i =1:numParticles %for all the particles. 
             particles(i).turn(turn); %turn the particle in the same way as the real robot
             particles(i).move(move); %move the particle in the same way as the real robot

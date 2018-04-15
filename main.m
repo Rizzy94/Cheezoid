@@ -4,12 +4,12 @@ COM_CloseNXT all        %prepares workspace
 h = COM_OpenNXT();      %look for USB devices
 COM_SetDefaultNXT(h);   %sets default handle
 
-%[cmPerDeg, movementNoise, degPerDeg, turningNoise] = NXTFullCalibration(5, 500, 50, 1500, 50);
+%[cmPerDeg, movementNoise, degPerDeg, turningNoise] = NXTFullCalibration(10, 500, 50, 1500, 50);
 
-cmPerDeg = 0.0361;
-degPerDeg = 0.2067;
-movementNoise = 0.9083;
-turningNoise = 12.2474;
+cmPerDeg = 0.0368;
+degPerDeg = 0.2323;
+movementNoise = 0.3162;
+turningNoise = 26.0606;
 
 pause(.5)
 
