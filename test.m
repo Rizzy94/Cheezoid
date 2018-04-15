@@ -10,18 +10,11 @@ nxt.beep(440, 200); %Beep beep
 %error in the code
 try
     nxt.sensorAngle()
-    numScans = 30;
+    numScans = 72;
     scanA = nxt.rotScan(numScans);
     pause(0.3)
     scanB = nxt.rotScan(numScans);  
     pause(0.3)
-    scanC = nxt.rotScan(numScans);
-    pause(0.3)
-    scanD = nxt.rotScan(numScans);
-    pause(0.3)
-    scanE = nxt.rotScan(numScans);
-    pause(0.3)
-    scanF = nxt.rotScan(numScans);
 % 
 % %     figure
 % %     polarplot(linspace(0,2*pi,numScans),scanA(:,1), '-*')
@@ -29,16 +22,39 @@ try
 % %     polarplot(linspace(0,2*pi,numScans),scanB(:,1), '-*')
 % %     legend('scan1', 'scan2');
 % %     hold off
+
+close all
+clf
+
+    map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
+    target = [80,80];
+
+    startAngle =0;  
+    endAngle = ((numScans-1)*2*pi)/numScans;  
+    angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
+    scanLines =  [cos(angles); sin(angles)]'*100;
+    scanOffSet = [0, 0];
+
+    plotMe = true;
+
+    botGhost = BotSim(map); %how to set up a vector of objects
+    botGhost.setScanConfig(scanLines,scanOffSet);
+    botGhost.setSensorNoise(0);
+    botGhost.setMotionNoise(0);
+    botGhost.setTurningNoise(0);
+    botGhost.setBotPos([21,65.5]); %spawn the particles in random locations
+    botGhost.setBotAng(-pi/2);
+          
+    scanGhost = botGhost.ultraScan();
+    scanGhost = circshift(scanGhost, -1);
+    
     figure
     plot(scanA(:,2), scanA(:,1));
     hold on
     plot(scanB(:,2), scanB(:,1));
-    plot(scanC(:,2), scanC(:,1));
-    plot(scanD(:,2), scanD(:,1));
-    plot(scanE(:,2), scanE(:,1));
-    plot(scanF(:,2), scanF(:,1));
+    plot(linspace(0,360,numScans), flipud(scanGhost), 'LineWidth',2)
     hold off
-    legend('scanA', 'scanB', 'scanC', 'scanD', 'scanE', 'scanF');
+    legend('scanA', 'scanB', 'flipud(scanGhost)');
 %     mario(nxt)
 catch ME
     warning('There was an error. Closing Robot Connection')

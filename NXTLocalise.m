@@ -7,7 +7,6 @@
 map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 target = [80,80];
 
-startAngle =0;    
 samples = 72;
 endAngle = ((samples-1)*2*pi)/samples;  
 angles = (startAngle:(endAngle - startAngle)/(samples-1):endAngle);
@@ -17,9 +16,7 @@ scanOffSet = [0, 0];
 dampeningFact = 0.00001;
 redistPercentage = 0.95;
 maxIterations = 25;
-sensorNoise = 1;    %UK
-
-robotMotorPow = 50;
+sensorNoise = 1; 
 
 numParticles = 500; 
 plotMe = true;
@@ -146,6 +143,8 @@ while(converged == 0 && n < maxIterations) %%particle filter loop
         end
         
     end
+    
+    converged = 0; %TAKE THIS OUT!!!
 end
 
 estPosition = mean(particlePositions);
