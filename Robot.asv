@@ -117,7 +117,9 @@ classdef Robot < handle
                         scanCount = scanCount + 1;
                         scan(scanCount, 1) = GetUltrasonic(SENSOR_1);
                         scan(scanCount, 2) = nxt.posC;
-                     end          
+                     end
+
+                     
 %                 scan(2:end) = flip(scan(2:end));
                 end
                 scan(:,2) = wrapTo360(scan(:,2)+20);
@@ -235,23 +237,23 @@ classdef Robot < handle
                if strcmp(userInput, 'straight') == 1
                    straight = 1;
                elseif strcmp(userInput, 'left') == 1
-                   nxt.m1Cal = nxt.m1Cal + 0.02;
-                   nxt.m2Cal = nxt.m2Cal - 0.02;
+                   m1Cal = m1Cal + 0.02;
+                   m2Cal = m2Cal - 0.02;
                elseif strcmp(userInput, 'right') == 1
-                   nxt.m1Cal = nxt.m1Cal - 0.02;
-                   nxt.m2Cal = nxt.m2Cal + 0.02;
+                   m1Cal = m1Cal - 0.02;
+                   m2cal = m2cal + 0.02;
                end
                 
             end
             
             %end left right 
             
-            nxt.cmPerDeg = mean(dists) / wheelDegsMove;
-            nxt.motionNoise = std(dists);
+            cmPerDeg = mean(dists) / wheelDegsMove;
+            motionNoise = std(dists);
 
-            sprintf('This robot moves %d cm per 1 degree of wheel rotation.' , nxt.cmPerDeg)
+            sprintf('This robot moves %d cm per 1 degree of wheel rotation.' , cmPerDeg)
             disp(newline)
-            sprintf('This robot has approximately %d movementNoise.' , nxt.motionNoise)
+            sprintf('This robot has approximately %d movementNoise.' , motionNoise)
             disp(newline)
 
             %% Angular Calibration
@@ -299,12 +301,12 @@ classdef Robot < handle
             sprintf('degPerDeg: %d' , nxt.degPerDeg)
             sprintf('turningNoise: %d' , nxt.turningNoise)
             sprintf('m1cal: %d' , nxt.m1Cal)
-            sprintf('m2cal: %d' , nxt.m2Cal)
+            sprintf('m2cal: %d' , nxt.m2C)
             userInput = input('Do you want to save to callibration.mat? (yes/no) ==> ', 's');
             if strcmp(userInput,'yes')
-                save('callibration.mat', 'nxt.cmPerDeg' , 'nxt.degPerDeg', 'nxt.motionNoise', 'nxt.turningNoise', 'nxt.m1Cal', 'nxt.m2Cal');                
+                save('callibration.mat', 'cmPerDeg' , 'degPerDeg', 'motionNoise', 'turningNoise');                
             else
-                warning('Input not equal to "yes". Callibration variables will not be saved')
+                  warning('Input not equal to "yes". Callibration variables will not be saved')
             end
             nxt.loadCallibration(); %load the new OR old callibration variables
 

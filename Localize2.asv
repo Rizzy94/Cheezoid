@@ -44,7 +44,7 @@ n = 0;
 
 while(converged == 0 || n < 2)
     n=n+1;
-    scanA = nxt.rotScan(numScans); %TODO: simplify these 5 lines into 1 line
+    scanA = nxt.rotScan(numScans); %TODO: simplify this into 1 line
     pause(0.3)
     scanB = nxt.rotScan(numScans);  
     pause(0.3)
@@ -58,7 +58,7 @@ while(converged == 0 || n < 2)
 
     for i = 1:numParticles
         rawScan = particles(i).ultraScan(); %get a scan from the particles
-        rawScan = flipud(circshift(rawScan, -1)); %todo, more computationally effecient to flip just the bot scan not everything else.
+        rawScan = flipud(circshift(rawScan, -1));
         rawScan(rawScan > 255) = 255;
         distances(:,i) = rawScan;
 
@@ -120,7 +120,7 @@ while(converged == 0 || n < 2)
         particles(i).setBotAng(newParticles(i).getBotAng());
         particles(i).setBotPos(newParticles(i).getBotPos());
     end
-    
+
     if true %n == 0 || botScan(1) <= 30
         %auxVar = scanLines(botScan == max(botScan),:);
         %turn = atan2(auxVar(1,2), auxVar(1,1));
@@ -132,7 +132,7 @@ while(converged == 0 || n < 2)
     move = 5;   %4
     
     if converged == 0
-        
+        %nxt.turn(turn);
         nxt.move(move); %turn the real robot.  
         for i =1:numParticles %for all the particles. 
             %particles(i).turn(turn); %turn the particle in the same way as the real robot
@@ -147,5 +147,3 @@ while(converged == 0 || n < 2)
 end
 
 estPosition = mean(particlePositions);
-%TODO: update the bot position variable nxt.pos = [X, Y], is this just
-%estPosition. 

@@ -2,11 +2,11 @@ clear;
 % Load the example data.
 load('exampleScans2.mat', 'scanA', 'scanB', 'scanC', 'scanD', 'scanE', 'scanF');
 % 
-data1 = [scanA; scanB];%; scanC; scanD; scanE; scanF];
+data1 = [scanA; scanB];% scanC; scanD; scanE; scanF];
 
 genOpt = genfisOptions('GridPartition');
-genOpt.NumMembershipFunctions = 8;
-genOpt.InputMembershipFunctionType = 'bellmf';
+genOpt.NumMembershipFunctions = 10;
+genOpt.InputMembershipFunctionType = 'trimf';
 inFIS = genfis(data1(:,2),data1(:,1),genOpt);
 
 opt = anfisOptions('InitialFIS',inFIS, 'EpochNumber',250);
