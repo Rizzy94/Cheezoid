@@ -1,15 +1,17 @@
-function [botPos,botAng,arrived,lost] = FollowPath(nxt, pathCoord,botPos,botAng,pathLength,map,plotit)
+function [botPos,botAng,arrived,lost] = FollowPath(nxt, pathCoord,botPos,botAng,pathLength,samples,map,plotit)
 
 CurrentBotEstimate = BotSim(map);
 CurrentBotEstimate.setBotPos(botPos);
 CurrentBotEstimate.setBotAng(botAng);
 goalPos = pathCoord(pathLength,:);
 
+orientAngles = samples;
+modifiedMap = map;
 arrived = 0;
 lost = 0;
 
 %% MOVE DOWN PATH SETUP
-botSim.setScanConfig(botSim.generateScanConfig(orientAngles)) % make sure its in the right scan config, might not be necessary?
+CurrentBotEstimate.setScanConfig(CurrentBotEstimate.generateScanConfig(orientAngles)) % make sure its in the right scan config, might not be necessary?
 
 pathDistAng = zeros(pathLength-1,2); %set up vectors to contain step information
 turns = zeros(pathLength-1,1);
@@ -41,13 +43,13 @@ end
      pathDistAng(i,1) = sqrt((pathCoord(i,1)-pathCoord(i+1,1))^2+(pathCoord(i,2)-pathCoord(i+1,2))^2);
      pathDistAng(i,2) = atan2((pathCoord(i+1,1)-pathCoord(i,1)),(pathCoord(i+1,2)-pathCoord(i,2)));      %angle is measured from positive x axis
      turns(i,1) = -CurrentBotEstimate.getBotAng() + pathDistAng(i,2);
-      %make moves
+     turns(i,1) = -turns(i,1); %make moves
       % do something like after the turn if forward scan is less than the
      % movement then don't do it? Probs have to relocalise
      if plotit == 1
          clf
-         botSim.drawMap();
-         botSim.drawBot(20,'g');
+         CurrentBotEstimate.drawMap();
+         CurrentBotEstimate.drawBot(20,'g');
          CurrentBotEstimate.drawBot(20,'r');
      end
 
@@ -69,27 +71,32 @@ end
 
      %scans
 %      botSim.turn(turns(i,1)); 
-     NXTTurn(turns(i,1), degPerDeg, robotMotorPow);
-     % nxt.turn(turns(i,1));
+     nxt.turn(turns(i,1));
      % DO TWO SEPARATE SCANS, BEFORE FORWARD MOVEMENT AND AFTER
 %      [botScanMoveCheck,~] = botSim.ultraScan();
-       [botScanMoveCheck,~] = NXTUltraScan(samples, round(360/degPerDeg));
-%        botScanMoveCheck = nxt.rotScan(samples);
+     botScanMoveCheck = nxt.rotScan(samples);
+     pause(0.3);
+     botScanMoveCheck1 = nxt.rotScan(samples);
 
-     if botScanMoveCheck(1) < 11*pathDistAng(i,1)/10 % will edit predicted collision criteria to match bot
-         CurrentBotEstimate.turn(turns(i,1));
-         disp('Forward scan predicts collision; relocalise');
-         arrived = 0;
-         lost = 1;
-         break % if it detects a forward collision, presumably it is not on route, and so it will cancel pathfollowing and output arrived = 0                  
-     end
+
+%      if botScanMoveCheck(1) < 14*pathDistAng(i,1)/10 % will edit predicted collision criteria to match bot
+%          CurrentBotEstimate.turn(turns(i,1));
+%          disp('Forward scan predicts collision; relocalise');
+%          arrived = 0;
+%          lost = 1;
+%          break % if it detects a forward collision, presumably it is not on route, and so it will cancel pathfollowing and output arrived = 0                  
+%      end
 
 %      botSim.move(pathDistAng(i,1)); 
-     NXTMove(pathDistAng(i,1), cmPerDeg, robotMotorPow);
-     % nxt.move(pathDistAng(i,1))
+%      NXTMove(pathDistAng(i,1), cmPerDeg, robotMotorPow);
+     nxt.move(pathDistAng(i,1))
 %      [botScan2,~] = botSim.ultraScan();
-     [botScan2,~] = NXTUltraScan(samples, round(360/degPerDeg));
-     % [botScan2, ~] = nxt.rotScan(samples);
+%      [botScan2,~] = NXTUltraScan(samples, round(360/degPerDeg));
+      botScan2 = nxt.rotScan(samples);
+      pause(0.3);
+      botScan22 = nxt.rotScan(samples);
+
+%       botScan2crap = nxt.rotScan(samples);
      [idealScan,~] = IdealBot.ultraScan();
      for j = 1:checkBotsNum
          if CheckBots(j).pointInsideMap(CheckBots(j).getBotPos()) == 1
@@ -102,7 +109,7 @@ end
                    scanDiff2(j,k) = abs(checkBotScans(j,k) - botScan2(k,1));
                 end
              end
-             scanProb2(j,1) = prob(normpdf(scanDiff2(j,:),0,3));             % I imagine this is going to need changing to something which can handle a shit sensor. Poisson dist? Log normal?        
+             scanProb2(j,1) = prod(normpdf(scanDiff2(j,:),0,3));             % I imagine this is going to need changing to something which can handle a shit sensor. Poisson dist? Log normal?        
          else
              scanProb2(j,1) = -1; % stops points outside map getting picked
          end
@@ -128,16 +135,17 @@ end
         end
      end
      
-     if sum(estiDiff)/valid > 10
-         disp('Best estimate is bad so robot is considered lost, need to relocalise');
-         lost = 1;
-         arrived = 0;
-         break
-     elseif sum(estiDiff)/valid <= 10 && sum(abs(CurrentBotEstimate.getBotPos() - IdealBot.getBotPos())) > 20
-         disp('Bot is off of planned route, but not lost. Replan route');
-         lost = 0;
-         arrived = 0;
-     end
+%      if sum(estiDiff)/valid > 10
+%          disp('Best estimate is bad so robot is considered lost, need to relocalise');
+%          lost = 1;
+%          arrived = 0;
+%          break
+% 
+%      elseif sum(estiDiff)/valid <= 10 && sum(abs(CurrentBotEstimate.getBotPos() - IdealBot.getBotPos())) > 20
+%          disp('Bot is off of planned route, but not lost. Replan route');
+%          lost = 0;
+%          arrived = 0;
+%      end
 
      stepCount = stepCount + 1;
      if stepCount == pathLength - 1         % i.e. bot has 'arrived' or at least has done last step in its planned path
