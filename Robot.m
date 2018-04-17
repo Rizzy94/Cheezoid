@@ -22,7 +22,8 @@ classdef Robot < handle
         %New Variables
         h; %the robot handle
         SensorAngle;
-        
+%         numScans = 30; %is this a desireable change? will need to change
+%         functions too for this to make sense.
         
         %Callibration Variables
         cmPerDeg; %forward distance
@@ -66,6 +67,9 @@ classdef Robot < handle
         
         %safely exit NXT
         function close(nxt)
+           if nxt.posC > 0 %if the wire is twisted
+                nxt.rotScan(20); %untwist the wire
+           end
            pause(.5)
            nxt.setUpScanner(0)
            COM_CloseNXT all;
@@ -87,7 +91,7 @@ classdef Robot < handle
         
         %rotating scan
         function scan = rotScan(nxt, numScans) 
-            scan = zeros(numScans,2);
+            scan = zeros(numScans, 1);
             initPos = nxt.sensorAngle();
             turnPow = nxt.pUltra * (-sign(initPos));
             
@@ -103,24 +107,22 @@ classdef Robot < handle
                      nxt.sensorAngle();
                      if nxt.posC >= scanCount*(360/numScans) && nxt.posC < 360
                         scanCount = scanCount + 1;
-                        scan(scanCount, 1) = GetUltrasonic(SENSOR_1);
-                        scan(scanCount, 2) = nxt.posC;
-                     end
-
+                        scan(scanCount) = GetUltrasonic(SENSOR_1);
+                     end        
                 end
+                scan(2:end) = flip(scan(2:end));
             end
-            
+            fudgeFactor = -15;
             if sign(initPos)>0 %Anti clockwise Scan
                 while nxt.datC.IsRunning || scanCount<numScans-1
                      nxt.sensorAngle();
-                     if nxt.posC <= 360 - scanCount*(360/numScans) && nxt.posC > 0
+                     if nxt.posC <= 360 + fudgeFactor - scanCount*(360/numScans) && nxt.posC > 0+fudgeFactor
                         scanCount = scanCount + 1;
-                        scan(scanCount, 1) = GetUltrasonic(SENSOR_1);
-                        scan(scanCount, 2) = nxt.posC;
+                        scan(scanCount) = GetUltrasonic(SENSOR_1);
                      end          
 %                 scan(2:end) = flip(scan(2:end));
                 end
-                scan(:,2) = wrapTo360(scan(:,2)+20);
+                
             end
        
             
@@ -261,7 +263,7 @@ classdef Robot < handle
             while strcmp(ready,'GO') == 0
                 ready = input(['Type GO when you are ready to measure robot turning movement' newline], 's');
             end
-
+            %set up commands for turn
             mA = NXTMotor('A', 'Power', nxt.pTurn, 'TachoLimit', wheelDegsTurn);
             mB = NXTMotor('B', 'Power', -nxt.pTurn, 'TachoLimit', wheelDegsTurn);
             mA.SpeedRegulation = false;
@@ -270,20 +272,15 @@ classdef Robot < handle
             mB.SmoothStart = true;
 
             angs = zeros(numTrials, 1);
-
+            %turn
             for i = 1:numTrials
-
                 mA.SendToNXT();
                 mB.SendToNXT();
-
                 mA.WaitFor();
                 mB.WaitFor();
-
                 mA.Stop('brake') 
                 mB.Stop('brake')
-
                 angs(i) = input(['How much did it turn in degrees?' newline]);
-
             end
 
             nxt.degPerDeg = mean(angs) / wheelDegsTurn;

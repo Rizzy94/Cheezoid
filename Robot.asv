@@ -22,7 +22,8 @@ classdef Robot < handle
         %New Variables
         h; %the robot handle
         SensorAngle;
-        
+%         numScans = 30; %is this a desireable change? will need to change
+%         functions too for this to make sense.
         
         %Callibration Variables
         cmPerDeg; %forward distance
@@ -34,7 +35,7 @@ classdef Robot < handle
         m3Cal = 1.0; %Calibration for motor 3 NOT NEEDED
         
         %power variables
-        pUltra = 30;    %ultra scanner power
+        pUltra = 40;    %ultra scanner power
         pTurn = 100;     %turning power
         pMove = 100;     %moving power
         
@@ -66,6 +67,9 @@ classdef Robot < handle
         
         %safely exit NXT
         function close(nxt)
+           if nxt.posC > 0 %if the wire is twisted
+                nxt.rotScan(20); %untwist the wire
+           end
            pause(.5)
            nxt.setUpScanner(0)
            COM_CloseNXT all;
@@ -87,7 +91,7 @@ classdef Robot < handle
         
         %rotating scan
         function scan = rotScan(nxt, numScans) 
-            scan = zeros(numScans,2);
+            scan = zeros(numScans, 1);
             initPos = nxt.sensorAngle();
             turnPow = nxt.pUltra * (-sign(initPos));
             
@@ -103,26 +107,22 @@ classdef Robot < handle
                      nxt.sensorAngle();
                      if nxt.posC >= scanCount*(360/numScans) && nxt.posC < 360
                         scanCount = scanCount + 1;
-                        scan(scanCount, 1) = GetUltrasonic(SENSOR_1);
-                        scan(scanCount, 2) = nxt.posC;
-                     end
-
+                        scan(scanCount) = GetUltrasonic(SENSOR_1);
+                     end        
                 end
+                scan(2:end) = flip(scan(2:end));
             end
-            
+            fudgeFactor = -;
             if sign(initPos)>0 %Anti clockwise Scan
                 while nxt.datC.IsRunning || scanCount<numScans-1
                      nxt.sensorAngle();
-                     if nxt.posC <= 360 - scanCount*(360/numScans) && nxt.posC > 0
+                     if nxt.posC <= 360 + fudgeFactor - scanCount*(360/numScans) && nxt.posC > 0+fudgeFactor
                         scanCount = scanCount + 1;
-                        scan(scanCount, 1) = GetUltrasonic(SENSOR_1);
-                        scan(scanCount, 2) = nxt.posC;
-                     end
-
-                     
+                        scan(scanCount) = GetUltrasonic(SENSOR_1);
+                     end          
 %                 scan(2:end) = flip(scan(2:end));
                 end
-                scan(:,2) = wrapTo360(scan(:,2)+20);
+                
             end
        
             
@@ -237,23 +237,23 @@ classdef Robot < handle
                if strcmp(userInput, 'straight') == 1
                    straight = 1;
                elseif strcmp(userInput, 'left') == 1
-                   m1Cal = m1Cal + 0.02;
-                   m2Cal = m2Cal - 0.02;
+                   nxt.m1Cal = nxt.m1Cal + 0.02;
+                   nxt.m2Cal = nxt.m2Cal - 0.02;
                elseif strcmp(userInput, 'right') == 1
-                   m1Cal = m1Cal - 0.02;
-                   m2cal = m2cal + 0.02;
+                   nxt.m1Cal = nxt.m1Cal - 0.02;
+                   nxt.m2Cal = nxt.m2Cal + 0.02;
                end
                 
             end
             
             %end left right 
             
-            cmPerDeg = mean(dists) / wheelDegsMove;
-            motionNoise = std(dists);
+            nxt.cmPerDeg = mean(dists) / wheelDegsMove;
+            nxt.motionNoise = std(dists);
 
-            sprintf('This robot moves %d cm per 1 degree of wheel rotation.' , cmPerDeg)
+            sprintf('This robot moves %d cm per 1 degree of wheel rotation.' , nxt.cmPerDeg)
             disp(newline)
-            sprintf('This robot has approximately %d movementNoise.' , motionNoise)
+            sprintf('This robot has approximately %d movementNoise.' , nxt.motionNoise)
             disp(newline)
 
             %% Angular Calibration
@@ -263,7 +263,7 @@ classdef Robot < handle
             while strcmp(ready,'GO') == 0
                 ready = input(['Type GO when you are ready to measure robot turning movement' newline], 's');
             end
-
+            %set up commands for turn
             mA = NXTMotor('A', 'Power', nxt.pTurn, 'TachoLimit', wheelDegsTurn);
             mB = NXTMotor('B', 'Power', -nxt.pTurn, 'TachoLimit', wheelDegsTurn);
             mA.SpeedRegulation = false;
@@ -272,20 +272,15 @@ classdef Robot < handle
             mB.SmoothStart = true;
 
             angs = zeros(numTrials, 1);
-
+            %turn
             for i = 1:numTrials
-
                 mA.SendToNXT();
                 mB.SendToNXT();
-
                 mA.WaitFor();
                 mB.WaitFor();
-
                 mA.Stop('brake') 
                 mB.Stop('brake')
-
                 angs(i) = input(['How much did it turn in degrees?' newline]);
-
             end
 
             nxt.degPerDeg = mean(angs) / wheelDegsTurn;
@@ -301,12 +296,12 @@ classdef Robot < handle
             sprintf('degPerDeg: %d' , nxt.degPerDeg)
             sprintf('turningNoise: %d' , nxt.turningNoise)
             sprintf('m1cal: %d' , nxt.m1Cal)
-            sprintf('m2cal: %d' , nxt.m2C)
+            sprintf('m2cal: %d' , nxt.m2Cal)
             userInput = input('Do you want to save to callibration.mat? (yes/no) ==> ', 's');
             if strcmp(userInput,'yes')
-                save('callibration.mat', 'cmPerDeg' , 'degPerDeg', 'motionNoise', 'turningNoise');                
+                save('callibration.mat', 'nxt.cmPerDeg' , 'nxt.degPerDeg', 'nxt.motionNoise', 'nxt.turningNoise', 'nxt.m1Cal', 'nxt.m2Cal');                
             else
-                  warning('Input not equal to "yes". Callibration variables will not be saved')
+                warning('Input not equal to "yes". Callibration variables will not be saved')
             end
             nxt.loadCallibration(); %load the new OR old callibration variables
 
