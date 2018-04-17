@@ -45,8 +45,8 @@ Modify nxtcallibration to work with left right too.
     - For motor A and Motor B
     - Add new callibration variables to properties, to load callibration 
       and save to callibration.mat.
-Fix my bodge of double scan, then delete scan cleaner
-Make forward scan function
+Fix my bodge of double scan,
+
 
 Structure:
 - Run localise to find position. (does this run into a wall if you start it facing a wall?)
@@ -54,7 +54,7 @@ Structure:
 - Run path planning
 - Path follow (maybe every ~30cm, do a quick scan to update position estimate?)
 - maybe while moving do forward scans, if this very different to what is expected then stop and rescan.
-        This would allow us to only stop and scan when we need to.
+        This would al
 - Reach destination. On stage of path one before the end. Do a scan, then make the final movement.
    I think this would be a combination of speed and accuracy.
 - Play mario theme.

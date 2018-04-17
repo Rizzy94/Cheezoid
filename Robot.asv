@@ -112,7 +112,7 @@ classdef Robot < handle
                 end
                 scan(2:end) = flip(scan(2:end));
             end
-            fudgeFactor = -15;
+            fudgeFactor = -;
             if sign(initPos)>0 %Anti clockwise Scan
                 while nxt.datC.IsRunning || scanCount<numScans-1
                      nxt.sensorAngle();
