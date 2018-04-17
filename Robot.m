@@ -32,9 +32,9 @@ classdef Robot < handle
         motionNoise;
         turningNoise;
         %power variables
-        pUltra =30;    %ultra scanner power
-        pTurn = 30;     %turning power
-        pMove = 70;     %moving power
+        pUltra = 30;    %ultra scanner power
+        pTurn = 80;     %turning power
+        pMove = 90;     %moving power
         
         %pos of the ultrascanner
         posC;
