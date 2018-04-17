@@ -5,14 +5,14 @@ close all; %clears figures
 
 map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 
-numScans = 72;
+numScans = 10;
 startAngle = 0;
 endAngle = ((numScans-1)*2*pi)/numScans;  
 angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
 scanLines =  [cos(angles); sin(angles)]'*100;
 scanOffSet = [0, 0];
 converged = 0;
-dampeningFact = 0.0000000001;
+dampeningFact = 0.000000001;
 redistPercentage = 0.95;
 sensorNoise = 1; 
 
@@ -42,7 +42,7 @@ nxt = Robot(); %creates robot object
 nxt.beep(440, 200); %Beep beep
 n = 0;
 
-while(converged == 0 || n < 2)
+while(converged == 0)
     n=n+1;
     scanA = nxt.rotScan(numScans);
     pause(0.3)
@@ -121,29 +121,58 @@ while(converged == 0 || n < 2)
         particles(i).setBotPos(newParticles(i).getBotPos());
     end
 
-    if true %n == 0 || botScan(1) <= 30
-        %auxVar = scanLines(botScan == max(botScan),:);
-        %turn = atan2(auxVar(1,2), auxVar(1,1));
-        turn = 0;
-    else
-        turn = 0;
-    end
+%     if true %n == 0 || botScan(1) <= 30
+%         %auxVar = scanLines(botScan == max(botScan),:);
+%         %turn = atan2(auxVar(1,2), auxVar(1,1));
+%         turn = 0;
+%     else
+%         turn = 0;
+%     end
 
-    move = 5;   %4
-    
     if converged == 0
-        %nxt.turn(turn);
-        nxt.move(move); %turn the real robot.  
+        move = 10;   %4
+        if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 2*move) == 0
+            foundRoute = 0;
+            while foundRoute == 0
+                nxt.turn(pi/2);
+                scanA = nxt.rotScan(numScans);
+                pause(0.3)
+                scanB = nxt.rotScan(numScans);  
+                pause(0.3)
+                botScan = (scanA(:,1));% + scanB)/2;
+                if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 2*move) == 1
+                    foundRoute = 1;
+                end
+                for i =1:numParticles %for all the particles. 
+                    particles(i).turn(pi/2 + randn/5); %turn the particle in the same way as the real robot
+                end
+            end
+        end
+        nxt.move(move);
         for i =1:numParticles %for all the particles. 
-            %particles(i).turn(turn); %turn the particle in the same way as the real robot
-            particles(i).move(move); %move the particle in the same way as the real robot
+            particles(i).move( move + randn ); %turn the particle in the same way as the real robot
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
             end
+            
         end
-
+        clf
+        particles(1).drawMap()
+        hold on
+        for i = 1:numParticles
+            particles(i).drawBot(3);
+        end
+        drawnow;
     end
-    
+        
 end
 
 estPosition = mean(particlePositions);
+clf
+particles(1).drawMap()
+hold on
+for i = 1:numParticles
+    particles(i).drawBot(3);
+end
+drawnow;
+nxt.close();
