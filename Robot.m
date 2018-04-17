@@ -34,7 +34,7 @@ classdef Robot < handle
         m3Cal = 1.0; %Calibration for motor 3 NOT NEEDED
         
         %power variables
-        pUltra = 30;    %ultra scanner power
+        pUltra = 40;    %ultra scanner power
         pTurn = 100;     %turning power
         pMove = 100;     %moving power
         
