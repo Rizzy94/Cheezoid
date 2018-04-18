@@ -18,7 +18,7 @@ turns = zeros(pathLength-1,1);
 %Bot.drawBot(5,'b');
 %Setup idealbot
 IdealBot = BotSim(modifiedMap); %initiate
-IdealBot.setBotPos(flip(pathCoord(1,:))); %set pos
+IdealBot.setBotPos(pathCoord(1,:)); %set pos          % DO I STILL WANT TO FLIP THE PATH? I THINK NOT
 IdealBot.setBotAng(CurrentBotEstimate.getBotAng()); %set ang
 IdealBot.setScanConfig(IdealBot.generateScanConfig(orientAngles)) %set scan config
 %setup checkbots
@@ -43,7 +43,7 @@ end
      pathDistAng(i,1) = sqrt((pathCoord(i,1)-pathCoord(i+1,1))^2+(pathCoord(i,2)-pathCoord(i+1,2))^2);
      pathDistAng(i,2) = atan2((pathCoord(i+1,1)-pathCoord(i,1)),(pathCoord(i+1,2)-pathCoord(i,2)));      %angle is measured from positive x axis
      turns(i,1) = -CurrentBotEstimate.getBotAng() + pathDistAng(i,2);
-     turns(i,1) = -turns(i,1); %make moves
+     turns(i,1) = -turns(i,1); %make moves                                      STILL NEED TO NEGATE TURNS?
       % do something like after the turn if forward scan is less than the
      % movement then don't do it? Probs have to relocalise
      if plotit == 1
