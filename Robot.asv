@@ -238,9 +238,9 @@ classdef Robot < handle
                if strcmp(userInput, 'correct') == 1
                    correct = 1;
                elseif strcmp(userInput, 'over') == 1
-                   nxt.cmPerDeg = nxt.cmPerDeg + 0.001;
+                   nxt.cmPerDeg = nxt.cmPerDeg + 0.02;
                elseif strcmp(userInput, 'under') == 1
-                   nxt.cmPerDeg = nxt.cmPerDeg - 0.001;
+                   nxt.cmPerDeg = nxt.cmPerDeg - 0.02;
                else 
                    warning('Expected input: over; under; correct')
                end               
@@ -250,7 +250,7 @@ classdef Robot < handle
             nxt.userReady('measure straight movement')
             straight = 0;
             while ~straight
-               nxt.move(22)
+               nxt.move(10)
                userInput = input(['Did the robot move left/right/straight?' newline], 's');            
                if strcmp(userInput, 'straight') == 1
                    straight = 1;
@@ -269,21 +269,19 @@ classdef Robot < handle
             nxt.userReady('observe a 90 degree turn')
             correct = 0;
             while ~correct
-               nxt.turn(pi/2)
+               nxt.turn(22)
                userInput = input(['Did the robot move over/under/correct?' newline], 's');            
                if strcmp(userInput, 'correct') == 1
                    correct = 1;
                elseif strcmp(userInput, 'over') == 1
-                   nxt.degPerDeg = nxt.degPerDeg + 0.01;
+                   nxt.degPerDeg = nxt.cmPerDeg + 0.02;
                elseif strcmp(userInput, 'under') == 1
-                   nxt.degPerDeg = nxt.degPerDeg - 0.01;
+                   nxt.degPerDeg = nxt.cmPerDeg - 0.02;
                else 
                    warning('Expected input: over; under; correct')
                end               
             end 
-            
-            %decide whether to save the new calibration variables, then
-            %reload from calibration.mat
+
             userInput = input('Do you want to save to calibration.mat? (yes/no) ==> ', 's');
             if strcmp(userInput,'yes')
                 nxt.saveCalibration()                

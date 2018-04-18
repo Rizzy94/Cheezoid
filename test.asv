@@ -56,12 +56,7 @@ try
 %     hold off
 %     legend('scanA', 'scanB', 'flipud(scanGhost)');
 %     mario(nxt)
-    
-    nxt.turn(pi)
-    nxt.move(66)
-    nxt.turn(-pi/2)
-    nxt.move(44)
-    
+    nxt.calibrate()
 catch ME
     warning('There was an error. Closing Robot Connection')
     display(ME.message) %print the error message
