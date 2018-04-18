@@ -140,7 +140,7 @@ classdef Robot < handle
        
             
             mC.WaitFor();
-
+            mC.Stop('brake') %this is new is it good tho?
         end
         
         
