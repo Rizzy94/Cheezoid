@@ -3,28 +3,15 @@ clc;        %clears console
 clear all;      %clears workspace
 close all; %clears figures
 
-nxt = Robot(); %creates robot object
-nxt.beep(440, 200); %Beep beep
 
-%try block means the robot will always be able to exit using nxt.close() even if there is an
-%error in the code
-try
-    nxt.sensorAngle()
-    numScans = 30;
-    scanA = nxt.rotScan(numScans);
-    pause(0.3)
-    scanB = nxt.rotScan(numScans);  
-    pause(0.3)
+load('exampleScans.mat', 'scanA', 'scanB', 'scanC', 'scanD', 'scanE', 'scanF')
 
-    figure
-    plot(linspace(0,2*pi,numScans),scanA(), '-*')
-    hold on
-    plot(linspace(0,2*pi,numScans),scanB(), '-*')
-    legend('scan1', 'scan2');
-    hold off
+scanA = scanA(:,1);
+scanB = scanB(:,1);
+scanC = scanC(:,1);
+scanD = scanD(:,1);
+scanE = scanE(:,1);
+scanF = scanF(:,1);
 
-catch ME
-    warning('There was an error. Closing Robot Connection')
-    display(ME.message) %print the error message
-end
-nxt.close();
+save('exampleScans.mat', 'scanA', 'scanB', 'scanC', 'scanD', 'scanE', 'scanF')
+plotScan([scanA scanB scanC scanD scanE scanF])
