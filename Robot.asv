@@ -143,6 +143,46 @@ classdef Robot < handle
 
         end
         
+        %rotating scan
+        function scan = rotScanStopStart(nxt, numScans) 
+            scan = zeros(numScans, 1);
+            initPos = nxt.sensorAngle();
+            turnPow = nxt.pUltra * (-sign(initPos));
+            
+            mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', 400); %make this so it moves to a set position
+            mC.SpeedRegulation = false;
+            mC.SmoothStart = false;
+            pause(.5); %why is this pause here, can it be shorter?
+
+            mC.SendToNXT();
+            scanCount = 0;
+            if sign(initPos)<0 %Clockwise Scan
+                while nxt.datC.IsRunning || scanCount<numScans-1
+                     nxt.sensorAngle();
+                     if nxt.posC >= scanCount*(360/numScans) && nxt.posC < 360
+                        scanCount = scanCount + 1;
+                        scan(scanCount) = GetUltrasonic(SENSOR_1);
+                     end        
+                end
+                scan(2:end) = flip(scan(2:end));
+            end
+            fudgeFactor = -15;
+            if sign(initPos)>0 %Anti clockwise Scan
+                while nxt.datC.IsRunning || scanCount<numScans-1
+                     nxt.sensorAngle();
+                     if nxt.posC <= 360 + fudgeFactor - scanCount*(360/numScans) && nxt.posC > 0+fudgeFactor
+                        scanCount = scanCount + 1;
+                        scan(scanCount) = GetUltrasonic(SENSOR_1);
+                     end          
+%                 scan(2:end) = flip(scan(2:end));
+                end
+                
+            end
+       
+            
+            mC.WaitFor();
+
+        end
         
         function setUpScanner(nxt, initial)
             if initial == 1
@@ -238,9 +278,9 @@ classdef Robot < handle
                if strcmp(userInput, 'correct') == 1
                    correct = 1;
                elseif strcmp(userInput, 'over') == 1
-                   nxt.cmPerDeg = nxt.cmPerDeg + 0.02;
+                   nxt.cmPerDeg = nxt.cmPerDeg + 0.001;
                elseif strcmp(userInput, 'under') == 1
-                   nxt.cmPerDeg = nxt.cmPerDeg - 0.02;
+                   nxt.cmPerDeg = nxt.cmPerDeg - 0.001;
                else 
                    warning('Expected input: over; under; correct')
                end               
@@ -250,7 +290,7 @@ classdef Robot < handle
             nxt.userReady('measure straight movement')
             straight = 0;
             while ~straight
-               nxt.move(10)
+               nxt.move(22)
                userInput = input(['Did the robot move left/right/straight?' newline], 's');            
                if strcmp(userInput, 'straight') == 1
                    straight = 1;
@@ -269,19 +309,21 @@ classdef Robot < handle
             nxt.userReady('observe a 90 degree turn')
             correct = 0;
             while ~correct
-               nxt.turn(22)
+               nxt.turn(pi/2)
                userInput = input(['Did the robot move over/under/correct?' newline], 's');            
                if strcmp(userInput, 'correct') == 1
                    correct = 1;
                elseif strcmp(userInput, 'over') == 1
-                   nxt.degPerDeg = nxt.cmPerDeg + 0.02;
+                   nxt.degPerDeg = nxt.degPerDeg + 0.01;
                elseif strcmp(userInput, 'under') == 1
-                   nxt.degPerDeg = nxt.cmPerDeg - 0.02;
+                   nxt.degPerDeg = nxt.degPerDeg - 0.01;
                else 
                    warning('Expected input: over; under; correct')
                end               
             end 
-
+            
+            %decide whether to save the new calibration variables, then
+            %reload from calibration.mat
             userInput = input('Do you want to save to calibration.mat? (yes/no) ==> ', 's');
             if strcmp(userInput,'yes')
                 nxt.saveCalibration()                
