@@ -63,3 +63,11 @@ Structure:
 - Play mario theme.
 
 
+
+Apparently:
+
+Modelling the sensor noise is very important.
+So figure out when the angles are acute in the botSim
+Then model them as unreliable for the actual robot.
+Then 
+

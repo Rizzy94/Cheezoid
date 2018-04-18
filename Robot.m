@@ -140,9 +140,57 @@ classdef Robot < handle
        
             
             mC.WaitFor();
-
+            mC.Stop('brake') %this is new is it good tho?
         end
         
+        %rotating scan
+        function scan = rotScanStopStart(nxt, numScans) 
+            scan = zeros(numScans, 1);
+            initPos = nxt.sensorAngle();
+            turnPow = nxt.pUltra * (-sign(initPos));
+            
+            mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', 400); %make this so it moves to a set position
+            mC.SpeedRegulation = false;
+            mC.SmoothStart = false;
+            pause(.5); %why is this pause here, can it be shorter?
+
+            mC.SendToNXT();
+            scanCount = 0;
+            if sign(initPos)<0 %Clockwise Scan
+                while nxt.datC.IsRunning || scanCount<numScans-1
+                     nxt.sensorAngle();
+                     if nxt.posC >= scanCount*(360/numScans) && nxt.posC < 360
+                        scanCount = scanCount + 1;
+                        mC.Stop('brake')
+                        pause(.2)
+                        scan(scanCount) = GetUltrasonic(SENSOR_1);
+                        pause(.1)
+                        mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', 400-abs(nxt.posC - initPos)); %make this so it moves to a set position
+                        mC.SpeedRegulation = false;
+                        mC.SmoothStart = false;
+                        pause(.5); %why is this pause here, can it be shorter?
+                        mC.SendToNXT();
+                     end        
+                end
+                scan(2:end) = flip(scan(2:end));
+            end
+            fudgeFactor = -15;
+            if sign(initPos)>0 %Anti clockwise Scan
+                while nxt.datC.IsRunning || scanCount<numScans-1
+                     nxt.sensorAngle();
+                     if nxt.posC <= 360 + fudgeFactor - scanCount*(360/numScans) && nxt.posC > 0+fudgeFactor
+                        scanCount = scanCount + 1;
+                        scan(scanCount) = GetUltrasonic(SENSOR_1);
+                     end          
+%                 scan(2:end) = flip(scan(2:end));
+                end
+                
+            end
+       
+            
+            mC.WaitFor();
+
+        end
         
         function setUpScanner(nxt, initial)
             if initial == 1

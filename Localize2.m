@@ -25,7 +25,11 @@ for i = 1:numParticles
     particles(i).setMotionNoise(0);
     particles(i).setTurningNoise(0);
     particles(i).randomPose(10); %spawn the particles in random locations
+<<<<<<< HEAD
     particles(i).setBotAng((floor(rand)*2*pi))
+=======
+    particles(i).setBotAng(floor(rand*4)*2*pi)
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
 end
 
 newParticles(numParticles,1) = BotSim; 
@@ -36,7 +40,11 @@ for i = 1:numParticles
     newParticles(i).setMotionNoise(0);
     newParticles(i).setTurningNoise(0);
     newParticles(i).randomPose(10); %spawn the particles in random locations
+<<<<<<< HEAD
     newParticles(i).setBotAng((floor(rand)*2*pi))
+=======
+    newParticles(i).setBotAng(floor(rand*4)*2*pi)
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
 end
 
 nxt = Robot(); %creates robot object
@@ -156,14 +164,22 @@ while(converged == 0)
             particles(i).move( move + randn ); %move the particle with some noise
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
+<<<<<<< HEAD
                 particles(i).setBotAng((floor(rand)*2*pi))
+=======
+                particles(i).setBotAng(floor(rand*4)*2*pi)
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
             end
         end
         for i = ((numParticles/2) + 1):numParticles %for the other half the particles. 
             particles(i).move( move*rand ); %move the particle less than the bot was supposed to move
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
+<<<<<<< HEAD
                 particles(i).setBotAng((floor(rand)*2*pi))
+=======
+                particles(i).setBotAng(floor(rand*4)*2*pi)
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
             end
         end
         clf
