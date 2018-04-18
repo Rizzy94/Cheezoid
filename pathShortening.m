@@ -11,7 +11,7 @@ checkBot.setScanConfig(checkBot.generateScanConfig(orientAngles));
 shortPath = pathCoord
 shortPathLength = size(shortPath,1);
 pathLength = pathLength(1);
-i = 1
+
 for i = 1:pathLength-1
     i
     if i > size(shortPath,1)
@@ -20,7 +20,7 @@ for i = 1:pathLength-1
    
    checkBot.setBotPos(shortPath(i,:))
    
-   viable = ones(pathLength,1);
+   viable = ones(size(shortPath,1),1);
    viable(1:i,1) = 0;         % set all previous points to 0. makes life easier. 0 IMPLIES POINT IS VIABLE. WEIRD I KNOW BUT IT COMES FROM HOW I SEARCH
    
    
@@ -49,19 +49,23 @@ for i = 1:pathLength-1
    I = find(viable,1)      % this should find the first NOT VIABLE node, so last viable node is the one before FIND FINDS THE FIRST NON ZERO ELEMENT
    
    if ~isempty(I)
-       for j = i+1:min(size(shortPath,1)-1,I(1)-2)       % -1 would go to the last good node, which we want to keep. so then -2
-           removed = j
+       for j = min(size(shortPath,1)-1,I(1)-2):-1:i+1       % -1 would go to the last good node, which we want to keep. so then -2
            shortPath(j,:) = [];  
-           
+           removed = j
            shortPath
        end
    else
+       for j = size(shortPath,1)-1:-1:i+1          
+           shortPath(j,:) = [];
+           removed = j
+           shortPath
+       end
        break
    end
-   shortPath
    
 end
 
+shortPath
 figure(2)
 checkBot.drawMap();
 checkBot.drawBot(3);
