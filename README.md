@@ -20,6 +20,9 @@ By about 15 degrees
 - 90 is to the right
 - 180 is behind
 
+-IN BOT SIM: positive angle rotates anti-clockwise
+-This is also true with our robot. 
+-In robot mA is on left, mB is on right.
 
 Plan:
 

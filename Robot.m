@@ -72,6 +72,7 @@ classdef Robot < handle
            end
            pause(.5)
            nxt.setUpScanner(0)
+           display('Closing robot connection')
            COM_CloseNXT all;
         end
         
@@ -180,12 +181,13 @@ classdef Robot < handle
         
         %move
         function move(nxt, howFar)
+            if howFar == 0; warning('nxt.move passed a 0 move command'); end
             %allow for backwards movements
-            movePow = nxt.pMove * sign(howFar);
+            movePow = nxt.pMove * -sign(howFar);
             howFar = abs(howFar);
             %run the motors
-            mA = NXTMotor('A', 'Power', movePow, 'TachoLimit', round(howFar/nxt.cmPerDeg)*nxt.m1Cal);
-            mB = NXTMotor('B', 'Power', movePow, 'TachoLimit', round(howFar/nxt.cmPerDeg))*nxt.m2Cal;
+            mA = NXTMotor('A', 'Power', movePow, 'TachoLimit', round((howFar*nxt.m1Cal)/nxt.cmPerDeg)); 
+            mB = NXTMotor('B', 'Power', movePow, 'TachoLimit', round((howFar*nxt.m2Cal)/nxt.cmPerDeg));
             mB.SpeedRegulation = false;
             mB.SmoothStart = true;
             mA.SpeedRegulation = false;
