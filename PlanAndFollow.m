@@ -11,7 +11,6 @@ goalPos = [80 90];
 samples = 30;
 lost = 0;
 arrived = 0;
-
 nxt = Robot();
 %% Actually using them
     %so this should plan a path, and then try to execute said path.
