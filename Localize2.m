@@ -25,6 +25,7 @@ for i = 1:numParticles
     particles(i).setMotionNoise(0);
     particles(i).setTurningNoise(0);
     particles(i).randomPose(10); %spawn the particles in random locations
+    particles(i).setBotAng(floor(rand*4)*2*pi)
 end
 
 newParticles(numParticles,1) = BotSim; 
@@ -35,6 +36,7 @@ for i = 1:numParticles
     newParticles(i).setMotionNoise(0);
     newParticles(i).setTurningNoise(0);
     newParticles(i).randomPose(10); %spawn the particles in random locations
+    newParticles(i).setBotAng(floor(rand*4)*2*pi)
 end
 
 nxt = Robot(); %creates robot object
@@ -153,12 +155,14 @@ while(converged == 0)
             particles(i).move( move + randn ); %move the particle with some noise
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
+                particles(i).setBotAng(floor(rand*4)*2*pi)
             end
         end
         for i = ((numParticles/2) + 1):numParticles %for the other half the particles. 
             particles(i).move( move*rand ); %move the particle less than the bot was supposed to move
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
+                particles(i).setBotAng(floor(rand*4)*2*pi)
             end
         end
         clf

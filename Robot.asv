@@ -140,7 +140,7 @@ classdef Robot < handle
        
             
             mC.WaitFor();
-            mC.Stop('brake') %this is new is it good tho?
+
         end
         
         %rotating scan
@@ -161,15 +161,7 @@ classdef Robot < handle
                      nxt.sensorAngle();
                      if nxt.posC >= scanCount*(360/numScans) && nxt.posC < 360
                         scanCount = scanCount + 1;
-                        mC.Stop('brake')
-                        pause(.2)
                         scan(scanCount) = GetUltrasonic(SENSOR_1);
-                        pause(.1)
-                        mC = NXTMotor('C', 'Power', turnPow, 'TachoLimit', 400-abs(nxt.posC - initPos)); %make this so it moves to a set position
-                        mC.SpeedRegulation = false;
-                        mC.SmoothStart = false;
-                        pause(.5); %why is this pause here, can it be shorter?
-                        mC.SendToNXT();
                      end        
                 end
                 scan(2:end) = flip(scan(2:end));
