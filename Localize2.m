@@ -57,7 +57,7 @@ while(converged == 0)
 
     for i = 1:numParticles
         rawScan = particles(i).ultraScan(); %get a scan from the particles
-        rawScan = flipud(circshift(rawScan, -1)); %todo, more computationally effecient to flip just the bot scan not everything else.
+        %rawScan = flipud(circshift(rawScan, -1)); %todo, more computationally effecient to flip just the bot scan not everything else.
         rawScan(rawScan > 255) = 255;
         distances(:,i) = rawScan;
 
@@ -102,15 +102,6 @@ while(converged == 0)
         newParticles(i).randomPose(10);
     end
 
-    %%
-    clf
-    particles(1).drawMap()
-    hold on
-    for i = 1:numParticles
-        particles(i).drawBot(3);
-    end
-    drawnow;
-
     if prod(std(particlePositions) < 5)  %from 4
         converged = 1;
     end
@@ -120,7 +111,15 @@ while(converged == 0)
         particles(i).setBotPos(newParticles(i).getBotPos());
     end
 
-
+    %%
+    clf
+    particles(1).drawMap()
+    hold on
+    for i = 1:numParticles
+        particles(i).drawBot(3);
+    end
+    drawnow;
+    
 %     if true %n == 0 || botScan(1) <= 30
 %         %auxVar = scanLines(botScan == max(botScan),:);
 %         %turn = atan2(auxVar(1,2), auxVar(1,1));
@@ -150,12 +149,17 @@ while(converged == 0)
             end
         end
         nxt.move(move);
-        for i =1:numParticles %for all the particles. 
-            particles(i).move( move + randn ); %turn the particle in the same way as the real robot
+        for i =1:(numParticles/2) %for half the particles. 
+            particles(i).move( move + randn ); %move the particle with some noise
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
             end
-            
+        end
+        for i = ((numParticles/2) + 1):numParticles %for the other half the particles. 
+            particles(i).move( move*rand ); %move the particle less than the bot was supposed to move
+            if particles(i).insideMap() == 0
+                particles(i).randomPose(10);
+            end
         end
         clf
         particles(1).drawMap()
@@ -165,6 +169,15 @@ while(converged == 0)
         end
         drawnow;
     end
+    
+    %%
+    clf
+    particles(1).drawMap()
+    hold on
+    for i = 1:numParticles
+        particles(i).drawBot(3);
+    end
+    drawnow;
         
 end
 
