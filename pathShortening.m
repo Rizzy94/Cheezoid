@@ -49,10 +49,10 @@ for i = 1:pathLength-1
    I = find(viable,1)      % this should find the first NOT VIABLE node, so last viable node is the one before FIND FINDS THE FIRST NON ZERO ELEMENT
    
    if ~isempty(I)
-       for j = i+1:I(1)-2       % -1 would go to the last good node, which we want to keep. so then -2
-           
-           shortPath(j,:) = [];  
+       for j = i+1:min(size(shortPath,1)-1,I(1)-2)       % -1 would go to the last good node, which we want to keep. so then -2
            removed = j
+           shortPath(j,:) = [];  
+           
            shortPath
        end
    else
