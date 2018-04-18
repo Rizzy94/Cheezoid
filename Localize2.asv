@@ -4,7 +4,11 @@ close all; %clears figures
 
 map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 
+<<<<<<< HEAD
+numScans = 18;
+=======
 numScans = 10;
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
 startAngle = 0;
 endAngle = ((numScans-1)*2*pi)/numScans;  
 angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
@@ -15,7 +19,11 @@ dampeningFact = 0.000000001;
 redistPercentage = 0.95;
 sensorNoise = 1; 
 
+<<<<<<< HEAD
+numParticles = 1500; 
+=======
 numParticles = 2000; 
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
 
 particles(numParticles,1) = BotSim; %how to set up a vector of objects
 for i = 1:numParticles
@@ -25,7 +33,11 @@ for i = 1:numParticles
     particles(i).setMotionNoise(0);
     particles(i).setTurningNoise(0);
     particles(i).randomPose(10); %spawn the particles in random locations
+<<<<<<< HEAD
+    particles(i).setBotAng((floor(rand)*2*pi))
+=======
     particles(i).setBotAng(floor(rand*4))
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
 end
 
 newParticles(numParticles,1) = BotSim; 
@@ -36,7 +48,11 @@ for i = 1:numParticles
     newParticles(i).setMotionNoise(0);
     newParticles(i).setTurningNoise(0);
     newParticles(i).randomPose(10); %spawn the particles in random locations
+<<<<<<< HEAD
+    newParticles(i).setBotAng((floor(rand)*2*pi))
+=======
     newParticles(i).setBotAng(floor(rand*4))
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
 end
 
 nxt = Robot(); %creates robot object
@@ -47,8 +63,11 @@ while(converged == 0)
     n=n+1;
     scanA = nxt.rotScan(numScans); %TODO: simplify these 5 lines into 1 line
     pause(0.3)
+<<<<<<< HEAD
+=======
     scanB = nxt.rotScan(numScans);  
     pause(0.3)
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
     botScan = (scanA(:,1));% + scanB)/2; Not sure if this really will ever be needed now
 
     distances = zeros(size(scanLines,1), numParticles);
@@ -133,11 +152,24 @@ while(converged == 0)
     if converged == 0
 
         move = 10;   %4
+<<<<<<< HEAD
+        if prod(botScan([1:round(numScans/6), (size(botScan,1)-round(numScans/6)):size(botScan,1)]) > 1.2*move) == 0
+        %if prod(botScan([1:5]) > 1.2*move) == 0
+=======
         if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 2*move) == 0
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
             foundRoute = 0;
             while foundRoute == 0
                 nxt.turn(pi/2);
                 scanA = nxt.rotScan(numScans);
+<<<<<<< HEAD
+                botScan = (scanA(:,1));% + scanB)/2;
+                if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 1.5*move) == 1
+                    foundRoute = 1;
+                end
+                for i =1:numParticles %for all the particles. 
+                    particles(i).turn(pi/2 + randn/2.5); %turn the particle in the same way as the real robot
+=======
                 pause(0.3)
                 scanB = nxt.rotScan(numScans);  
                 pause(0.3)
@@ -147,6 +179,7 @@ while(converged == 0)
                 end
                 for i =1:numParticles %for all the particles. 
                     particles(i).turn(pi/2 + randn/5); %turn the particle in the same way as the real robot
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
                 end
             end
         end

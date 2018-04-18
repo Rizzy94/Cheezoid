@@ -1,0 +1,11 @@
+function angle = orthoAngle(scan)
+
+scanAu
+
+[minVal, minInd] = min(scan);
+numScan = length(scan);
+
+angle = ((minInd-1)/numScan)*(2*pi);
+%angleDeg = radtodeg(angle);
+
+end

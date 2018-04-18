@@ -4,7 +4,7 @@ close all; %clears figures
 
 map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 
-numScans = 10;
+numScans = 4;
 startAngle = 0;
 endAngle = ((numScans-1)*2*pi)/numScans;  
 angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
@@ -15,7 +15,7 @@ dampeningFact = 0.000000001;
 redistPercentage = 0.95;
 sensorNoise = 1; 
 
-numParticles = 2000; 
+numParticles = 1500; 
 
 particles(numParticles,1) = BotSim; %how to set up a vector of objects
 for i = 1:numParticles
@@ -25,7 +25,11 @@ for i = 1:numParticles
     particles(i).setMotionNoise(0);
     particles(i).setTurningNoise(0);
     particles(i).randomPose(10); %spawn the particles in random locations
+<<<<<<< HEAD
+    particles(i).setBotAng((floor(rand)*2*pi))
+=======
     particles(i).setBotAng(floor(rand*4)*2*pi)
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
 end
 
 newParticles(numParticles,1) = BotSim; 
@@ -36,18 +40,24 @@ for i = 1:numParticles
     newParticles(i).setMotionNoise(0);
     newParticles(i).setTurningNoise(0);
     newParticles(i).randomPose(10); %spawn the particles in random locations
+<<<<<<< HEAD
+    newParticles(i).setBotAng((floor(rand)*2*pi))
+=======
     newParticles(i).setBotAng(floor(rand*4)*2*pi)
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
 end
 
 nxt = Robot(); %creates robot object
 nxt.beep(440, 200); %Beep beep
 n = 0;
 
+scan = nxt.rotScan(72);
+angletoTurn = orthoAngle(scan);
+nxt.turn(angleToturn);
+
 while(converged == 0)
     n=n+1;
     scanA = nxt.rotScan(numScans); %TODO: simplify these 5 lines into 1 line
-    pause(0.3)
-    scanB = nxt.rotScan(numScans);  
     pause(0.3)
     botScan = (scanA(:,1));% + scanB)/2; Not sure if this really will ever be needed now
 
@@ -102,6 +112,7 @@ while(converged == 0)
 
     for i = (round(numParticles*redistPercentage)+1):numParticles
         newParticles(i).randomPose(10);
+        newParticles(i).setBotAng((floor(rand)*2*pi))
     end
 
     if prod(std(particlePositions) < 5)  %from 4
@@ -133,20 +144,18 @@ while(converged == 0)
     if converged == 0
 
         move = 10;   %4
-        if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 2*move) == 0
+        if prod(botScan([1:round(numScans/6), (size(botScan,1)-round(numScans/6)):size(botScan,1)]) > 1.2*move) == 0
+        %if prod(botScan([1:5]) > 1.2*move) == 0
             foundRoute = 0;
             while foundRoute == 0
                 nxt.turn(pi/2);
                 scanA = nxt.rotScan(numScans);
-                pause(0.3)
-                scanB = nxt.rotScan(numScans);  
-                pause(0.3)
                 botScan = (scanA(:,1));% + scanB)/2;
-                if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 2*move) == 1
+                if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 1.5*move) == 1
                     foundRoute = 1;
                 end
                 for i =1:numParticles %for all the particles. 
-                    particles(i).turn(pi/2 + randn/5); %turn the particle in the same way as the real robot
+                    particles(i).turn(pi/2 + randn/2.5); %turn the particle in the same way as the real robot
                 end
             end
         end
@@ -155,14 +164,22 @@ while(converged == 0)
             particles(i).move( move + randn ); %move the particle with some noise
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
+<<<<<<< HEAD
+                particles(i).setBotAng((floor(rand)*2*pi))
+=======
                 particles(i).setBotAng(floor(rand*4)*2*pi)
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
             end
         end
         for i = ((numParticles/2) + 1):numParticles %for the other half the particles. 
             particles(i).move( move*rand ); %move the particle less than the bot was supposed to move
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
+<<<<<<< HEAD
+                particles(i).setBotAng((floor(rand)*2*pi))
+=======
                 particles(i).setBotAng(floor(rand*4)*2*pi)
+>>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
             end
         end
         clf
