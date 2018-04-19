@@ -12,7 +12,11 @@ function [ang, oScans] = orthoScans(scan)
     indices = zeros(numScans,1);
     for i = 1:4
        indices(i) = mod(ind1+(i*(numScans/4)), numScans);
+       if indices(i) == 0
+           indices(i) = length(scan);
+       end
     end
+    disp(indices);
     oScans = [scan(indices(1)); scan(indices(2)); scan(indices(3)); scan(indices(4))]; 
-
+    oScans = circshift(oScans, 1);
 end
