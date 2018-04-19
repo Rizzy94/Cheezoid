@@ -6,8 +6,8 @@ plotit = 1;
 
 botPos = [20 20];
 % botPos = [45 22];       % will come from localise
-botAng = 0;
-goalPos = [80 90];
+botAng = pi/2;    % PRETTY SURE IT THINKS PI/2 IS PARALLEL WITH THE POSITIVE X AXIS. WHY? GREAT QUESTION
+goalPos = [40 80];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
 samples = 30;
 lost = 0;
 arrived = 0;
@@ -26,6 +26,8 @@ nxt = Robot();
 
 %while lost == 0 
     [pathCoord,pathLength] = PathPlanning(botPos,goalPos,map,plotit);
+    [pathCoord,pathLength] = pathShortening(pathCoord,pathLength,[0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]);
+    
     while arrived == 0 && lost == 0 
         [botPos,botAng,arrived,lost] = FollowPath(nxt, pathCoord,botPos,botAng,pathLength,samples,map,plotit);
     end

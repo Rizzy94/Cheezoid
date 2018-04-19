@@ -36,5 +36,6 @@ figure(2)
 checkBot.drawMap();
 checkBot.drawBot(3);
 scatter(shortPath(:,1),shortPath(:,2))
+shortPathLength = size(shortPath,1);
 
 end
