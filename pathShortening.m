@@ -14,9 +14,7 @@ pathLength = pathLength(1);
 
 for i = 1:pathLength-1
     i
-    if i > size(shortPath,1)
-        break
-    end
+  
    
    checkBot.setBotPos(shortPath(i,:))
    
