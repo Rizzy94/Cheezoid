@@ -3,6 +3,7 @@ classdef Robot < handle
     
     properties
         % Default BotSim variables some are likely not needed.
+        goalPos;
         pos;    %position of the robot
         ang;    %angle of the robot (radians)
         dir;    %angle of the robot (stored as 2d vector)

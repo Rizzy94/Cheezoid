@@ -8,6 +8,9 @@ Thoughts:
 
 - Do forwardScans and a velocity calculation while moving.
   This will allow the robot to determine if it has got stuck, e.g. wheels go stuck.
+- Make sure initial via point is quite close, this will allow to validate the movement.
+- Add in checks to the move to ensure it doesn't crash.
+    -these checks need to be robust to noise / failed scans etc. ie a reading <5 doesn't make sense
 
 
 Findings:
