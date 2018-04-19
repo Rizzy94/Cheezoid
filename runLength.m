@@ -1,4 +1,4 @@
-function run = runLength(scan, n)
+function run = runLength(array, n)
     array = [1 1 0 0 1 1 1 0 0 0 1 1];
     n = 11;
     run = 0;
