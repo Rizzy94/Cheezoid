@@ -223,6 +223,7 @@ end
     % A* and simple path planning converge here
 [pathLength,~] = size(pathCoord);
 if plotit == 1
+    figure(1)
     hold on
     plotBot.drawBot(10,'r');
     g.drawBot(5,'b')
