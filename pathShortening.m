@@ -1,10 +1,7 @@
 function [shortPath,shortPathLength] = pathShortening(pathCoord,pathLength,map)
 
-maxStep = 100;           % can't be less than 14.1 .... for res = 10
-wallDist = 10;
 orientAngles = 30;
-numChecks = 100;
-to = []
+to = [];
 checkBot = BotSim(map);
 checkBot.setBotPos(pathCoord(1,:));
 checkBot.setScanConfig(checkBot.generateScanConfig(orientAngles));
@@ -34,19 +31,11 @@ while true
     end
 end
 
-
-
-
-
-
-
-
-
-
 shortPath
 figure(2)
 checkBot.drawMap();
 checkBot.drawBot(3);
 scatter(shortPath(:,1),shortPath(:,2))
+shortPathLength = size(shortPath,1);
 
 end
