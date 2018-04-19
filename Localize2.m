@@ -46,10 +46,9 @@ n = 0;
 prevPow = nxt.pUltra;
 nxt.pUltra = 20;
 scan = nxt.rotScan(72);
-nxt.pUltra = prevPow;
 angletoTurn = orthoAngle(scan);
 nxt.turn(angletoTurn);
-
+nxt.pUltra = prevPow;
 
 while(converged == 0)
     n=n+1;
@@ -117,7 +116,7 @@ while(converged == 0)
         newParticles(i).setBotAng((floor(rand*4)*pi/2))
     end
 
-    if prod(std(particlePositions) < 6)  %from 4
+    if prod(std(particlePositions) < 8)  %from 4
         converged = 1;
     end
 
@@ -165,14 +164,14 @@ while(converged == 0)
             end
         end
         nxt.move(move);
-        for i =1:(numParticles/2) %for half the particles. 
+        for i =1:round(numParticles/2) %for half the particles. 
             particles(i).move( move + randn ); %move the particle with some noise
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
-                particles(i).setBotAng((floor(rand)*pi/2))
+                particles(i).setBotAng((floor(rand*4)*pi/2))
             end
         end
-        for i = ((numParticles/2) + 1):numParticles %for the other half the particles. 
+        for i = (round(numParticles/2) + 1):numParticles %for the other half the particles. 
             particles(i).move( move*rand ); %move the particle less than the bot was supposed to move
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
@@ -221,12 +220,12 @@ nxt.pUltra = prevPow;
 ghostScan = botGhost.ultraScan();
 score = zeros(numScans,1);
 for i = 1:(numScans)
-    auxScan = circshift( ghostScan, i ) ;
+    auxScan = circshift( ghostScan, -i ) ;  %CHANGED i TO -i
     score(i) = sum(abs( orientationScan(orientationScan>10) - auxScan(orientationScan>10) ));
     %score(i) = sum(abs( orientationScan - circshift( ghostScan, i ) ));
 end
 [minScanVal, minScanInd] = min(score);
-bestAng = ((minScanInd-1)/numScans)*(2*pi) + pi;    %added plus pi (it's dubious, check)
+bestAng = ((minScanInd-1)/numScans)*(2*pi);% + pi;    %added plus pi (it's dubious, check)
 botGhost.setBotAng(bestAng);
 %disparity = mean (abs( circshift(distances(:,i),shift) - botScan ));
             
