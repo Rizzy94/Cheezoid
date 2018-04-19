@@ -1,8 +1,6 @@
-clf('reset'); %resets figures 
-clc;        %clears console
-close all; %clears figures
+function [estPosition, estAngle, botGhost] = Localize(nxt, numParticles, plotMe)
 
-map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
+map = nxt.map;
 
 numScans = 4;
 startAngle = 0;
@@ -15,7 +13,7 @@ dampeningFact = 0.00000001;
 redistPercentage = 0.75;
 sensorNoise = 1; 
 
-numParticles = 1500; 
+%numParticles = 1500; 
 
 particles(numParticles,1) = BotSim; %how to set up a vector of objects
 for i = 1:numParticles
@@ -46,10 +44,9 @@ n = 0;
 prevPow = nxt.pUltra;
 nxt.pUltra = 20;
 scan = nxt.rotScan(72);
-nxt.pUltra = prevPow;
 angletoTurn = orthoAngle(scan);
 nxt.turn(angletoTurn);
-
+nxt.pUltra = prevPow;
 
 while(converged == 0)
     n=n+1;
@@ -117,7 +114,7 @@ while(converged == 0)
         newParticles(i).setBotAng((floor(rand*4)*pi/2))
     end
 
-    if prod(std(particlePositions) < 6)  %from 4
+    if prod(std(particlePositions) < 8)  %from 4
         converged = 1;
     end
 
@@ -127,13 +124,15 @@ while(converged == 0)
     end
 
     %%
-    clf
-    particles(1).drawMap()
-    hold on
-    for i = 1:numParticles
-        particles(i).drawBot(3);
+    if plotMe
+        clf
+        particles(1).drawMap()
+        hold on
+        for i = 1:numParticles
+            particles(i).drawBot(3);
+        end
+        drawnow;
     end
-    drawnow;
     
 %     if true %n == 0 || botScan(1) <= 30
 %         %auxVar = scanLines(botScan == max(botScan),:);
@@ -165,20 +164,35 @@ while(converged == 0)
             end
         end
         nxt.move(move);
-        for i =1:(numParticles/2) %for half the particles. 
+        for i =1:round(numParticles/2) %for half the particles. 
             particles(i).move( move + randn ); %move the particle with some noise
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
-                particles(i).setBotAng((floor(rand)*pi/2))
+                particles(i).setBotAng((floor(rand*4)*pi/2))
             end
         end
-        for i = ((numParticles/2) + 1):numParticles %for the other half the particles. 
+        for i = (round(numParticles/2) + 1):numParticles %for the other half the particles. 
             particles(i).move( move*rand ); %move the particle less than the bot was supposed to move
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
                 particles(i).setBotAng(floor(rand*4)*pi/2)
             end
         end
+        
+        if plotMe
+            clf
+            particles(1).drawMap()
+            hold on
+            for i = 1:numParticles
+                particles(i).drawBot(3);
+            end
+            drawnow;
+        end
+        
+    end
+    
+    %%
+    if plotMe
         clf
         particles(1).drawMap()
         hold on
@@ -187,16 +201,6 @@ while(converged == 0)
         end
         drawnow;
     end
-    
-    %%
-    clf
-    particles(1).drawMap()
-    hold on
-    for i = 1:numParticles
-        particles(i).drawBot(3);
-    end
-    drawnow;
-        
 end
 
 estPosition = mean(particlePositions);
@@ -221,31 +225,34 @@ nxt.pUltra = prevPow;
 ghostScan = botGhost.ultraScan();
 score = zeros(numScans,1);
 for i = 1:(numScans)
-    auxScan = circshift( ghostScan, i ) ;
-    score(i) = sum(abs( orientationScan - circshift( ghostScan, i ) ));
+    auxScan = circshift( ghostScan, -i ) ;  %CHANGED i TO -i
+    score(i) = sum(abs( orientationScan(orientationScan>10) - auxScan(orientationScan>10) ));
     %score(i) = sum(abs( orientationScan - circshift( ghostScan, i ) ));
 end
 [minScanVal, minScanInd] = min(score);
-bestAng = ((minScanInd-1)/numScans)*(2*pi);% + pi;
+bestAng = ((minScanInd-1)/numScans)*(2*pi);% + pi;    %added plus pi (it's dubious, check)
 botGhost.setBotAng(bestAng);
 %disparity = mean (abs( circshift(distances(:,i),shift) - botScan ));
             
 %estAng = bestAng;
-
-clf
-particles(1).drawMap()
-hold on
-for i = 1:numParticles
-    particles(i).drawBot(3);
+if plotMe
+    clf
+    particles(1).drawMap()
+    hold on
+    for i = 1:numParticles
+        particles(i).drawBot(3);
+    end
+    drawnow;
 end
-drawnow;
-nxt.close();
 
+if plotMe
+    clf
+    botGhost.drawMap()
+    hold on
+    botGhost.drawBot(10);
+    drawnow;
+end
 
-clf
-botGhost.drawMap()
-hold on
-botGhost.drawBot(10);
-drawnow;
-nxt.close();
+%nxt.close();
 
+end
