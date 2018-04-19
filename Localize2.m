@@ -11,8 +11,8 @@ angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
 scanLines =  [cos(angles); sin(angles)]'*100;
 scanOffSet = [0, 0];
 converged = 0;
-dampeningFact = 0.000000001;
-redistPercentage = 0.95;
+dampeningFact = 0.00000001;
+redistPercentage = 0.75;
 sensorNoise = 1; 
 
 numParticles = 1500; 
@@ -25,11 +25,7 @@ for i = 1:numParticles
     particles(i).setMotionNoise(0);
     particles(i).setTurningNoise(0);
     particles(i).randomPose(10); %spawn the particles in random locations
-<<<<<<< HEAD
-    particles(i).setBotAng((floor(rand)*2*pi))
-=======
-    particles(i).setBotAng(floor(rand*4)*2*pi)
->>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
+    particles(i).setBotAng(floor(rand*4)*pi/2)
 end
 
 newParticles(numParticles,1) = BotSim; 
@@ -40,24 +36,25 @@ for i = 1:numParticles
     newParticles(i).setMotionNoise(0);
     newParticles(i).setTurningNoise(0);
     newParticles(i).randomPose(10); %spawn the particles in random locations
-<<<<<<< HEAD
-    newParticles(i).setBotAng((floor(rand)*2*pi))
-=======
-    newParticles(i).setBotAng(floor(rand*4)*2*pi)
->>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
+    newParticles(i).setBotAng(floor(rand*4)*pi/2)
 end
 
 nxt = Robot(); %creates robot object
 nxt.beep(440, 200); %Beep beep
 n = 0;
 
+prevPow = nxt.pUltra;
+nxt.pUltra = 20;
 scan = nxt.rotScan(72);
+nxt.pUltra = prevPow;
 angletoTurn = orthoAngle(scan);
-nxt.turn(angleToturn);
+nxt.turn(angletoTurn);
+
 
 while(converged == 0)
     n=n+1;
-    scanA = nxt.rotScan(numScans); %TODO: simplify these 5 lines into 1 line
+    %scanA = nxt.rotScanStopStart(numScans); %TODO: simplify these 5 lines into 1 line
+    scanA = nxt.rotScan(numScans);
     pause(0.3)
     botScan = (scanA(:,1));% + scanB)/2; Not sure if this really will ever be needed now
 
@@ -66,7 +63,7 @@ while(converged == 0)
     particleProbs = zeros(numParticles,1);
     particleShift = zeros(numParticles,1);
     particlePositions = zeros(round(numParticles*redistPercentage),2);
-
+    
     for i = 1:numParticles
         rawScan = particles(i).ultraScan(); %get a scan from the particles
         %rawScan = flipud(circshift(rawScan, -1)); %todo, more computationally effecient to flip just the bot scan not everything else.
@@ -86,7 +83,9 @@ while(converged == 0)
         end
 
     end
-
+    
+    [maxProb, maxProbParticleInd] = max(particleProbs);
+    
     %%
     clf
     particles(1).drawMap()
@@ -106,16 +105,19 @@ while(converged == 0)
     for i = 1:round(numParticles*redistPercentage)
         keep = size(particleDist(particleDist<rand),1) + 1;
         newParticles(i).setBotPos( particles(keep).getBotPos() + (randn(2,1)/2)');
-        newParticles(i).setBotAng( mod(particles(keep).getBotAng() + pi/size(scanLines,1) , 2*pi) + randn(1)/10)
+        %newParticles(i).setBotAng( mod(particles(keep).getBotAng() + pi/size(scanLines,1) , 2*pi) + randn(1)/10)
+        newParticles(i).setBotAng( mod(particles(keep).getBotAng() , 2*pi) + randn(1)/10)
         particlePositions(i,:) = getBotPos(newParticles(i));
     end   
 
+    bestAng = getBotAng(newParticles(maxProbParticleInd));
+    
     for i = (round(numParticles*redistPercentage)+1):numParticles
         newParticles(i).randomPose(10);
-        newParticles(i).setBotAng((floor(rand)*2*pi))
+        newParticles(i).setBotAng((floor(rand*4)*pi/2))
     end
 
-    if prod(std(particlePositions) < 5)  %from 4
+    if prod(std(particlePositions) < 6)  %from 4
         converged = 1;
     end
 
@@ -140,18 +142,21 @@ while(converged == 0)
 %     else
 %         turn = 0;
 %     end
-
+    %converged = 0;  %TAKE ME OUT
+    
     if converged == 0
 
         move = 10;   %4
-        if prod(botScan([1:round(numScans/6), (size(botScan,1)-round(numScans/6)):size(botScan,1)]) > 1.2*move) == 0
-        %if prod(botScan([1:5]) > 1.2*move) == 0
+        %if prod(botScan([1:round(numScans/6), (size(botScan,1)-round(numScans/6)):size(botScan,1)]) > 1.2*move) == 0
+        if (botScan(1) > 2*move) == 0
             foundRoute = 0;
             while foundRoute == 0
                 nxt.turn(pi/2);
-                scanA = nxt.rotScan(numScans);
+                %scanA = nxt.rotScanStopStart(numScans);
+                scanA = nxt.rotScanStopStart(numScans);
                 botScan = (scanA(:,1));% + scanB)/2;
-                if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 1.5*move) == 1
+                %if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 1.5*move) == 1
+                if (botScan(1) > 2*move) == 1
                     foundRoute = 1;
                 end
                 for i =1:numParticles %for all the particles. 
@@ -164,22 +169,14 @@ while(converged == 0)
             particles(i).move( move + randn ); %move the particle with some noise
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
-<<<<<<< HEAD
-                particles(i).setBotAng((floor(rand)*2*pi))
-=======
-                particles(i).setBotAng(floor(rand*4)*2*pi)
->>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
+                particles(i).setBotAng((floor(rand)*pi/2))
             end
         end
         for i = ((numParticles/2) + 1):numParticles %for the other half the particles. 
             particles(i).move( move*rand ); %move the particle less than the bot was supposed to move
             if particles(i).insideMap() == 0
                 particles(i).randomPose(10);
-<<<<<<< HEAD
-                particles(i).setBotAng((floor(rand)*2*pi))
-=======
-                particles(i).setBotAng(floor(rand*4)*2*pi)
->>>>>>> 75a39825e3418a2729a57d52ed2247a18ae869b1
+                particles(i).setBotAng(floor(rand*4)*pi/2)
             end
         end
         clf
@@ -204,6 +201,37 @@ end
 
 estPosition = mean(particlePositions);
 
+numScans = 60;
+startAngle = 0;
+endAngle = ((numScans-1)*2*pi)/numScans;  
+angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
+scanLines =  [cos(angles); sin(angles)]'*100;
+scanOffSet = [0, 0];
+botGhost = BotSim(map);
+botGhost.setScanConfig(scanLines,scanOffSet);
+botGhost.setSensorNoise(0);
+botGhost.setMotionNoise(0);
+botGhost.setTurningNoise(0);
+botGhost.setBotPos(estPosition); %spawn the particles in random locations
+botGhost.setBotAng(0);
+prevPow = nxt.pUltra;
+nxt.pUltra = 20;
+orientationScan = nxt.rotScan(numScans);
+nxt.pUltra = prevPow;
+ghostScan = botGhost.ultraScan();
+score = zeros(numScans,1);
+for i = 1:(numScans)
+    auxScan = circshift( ghostScan, i ) ;
+    score(i) = sum(abs( orientationScan(orientationScan>10) - auxScan(orientationScan>10) ));
+    %score(i) = sum(abs( orientationScan - circshift( ghostScan, i ) ));
+end
+[minScanVal, minScanInd] = min(score);
+bestAng = ((minScanInd-1)/numScans)*(2*pi) + pi;    %added plus pi (it's dubious, check)
+botGhost.setBotAng(bestAng);
+%disparity = mean (abs( circshift(distances(:,i),shift) - botScan ));
+            
+%estAng = bestAng;
+
 clf
 particles(1).drawMap()
 hold on
@@ -212,3 +240,12 @@ for i = 1:numParticles
 end
 drawnow;
 nxt.close();
+
+
+clf
+botGhost.drawMap()
+hold on
+botGhost.drawBot(10);
+drawnow;
+nxt.close();
+
