@@ -49,6 +49,7 @@ end
      % movement then don't do it? Probs have to relocalise
      if plotit == 1
          figure(3)
+         
          CurrentBotEstimate.drawMap();
          CurrentBotEstimate.drawBot(20,'r');
      end

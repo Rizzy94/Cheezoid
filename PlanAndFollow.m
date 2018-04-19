@@ -4,10 +4,10 @@
 map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 plotit = 1;
 
-botPos = [87 87];
+botPos = [22 87];
 % botPos = [45 22];       % will come from localise
-botAng = 0;    % PRETTY SURE IT THINKS PI/2 IS PARALLEL WITH THE POSITIVE X AXIS. WHY? GREAT QUESTION
-goalPos = [30 40];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
+botAng = 3*pi/2;    % PRETTY SURE IT THINKS PI/2 IS PARALLEL WITH THE POSITIVE X AXIS. WHY? GREAT QUESTION
+goalPos = [40 20];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
 samples = 30;
 lost = 0;
 arrived = 0;
