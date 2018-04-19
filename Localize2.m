@@ -46,7 +46,7 @@ n = 0;
 prevPow = nxt.pUltra;
 nxt.pUltra = 20;
 scan = nxt.rotScan(72);
-angletoTurn = orthoAngle(scan);
+[angletoTurn, ~] = orthoAngle(scan);
 nxt.turn(angletoTurn);
 nxt.pUltra = prevPow;
 
@@ -238,8 +238,6 @@ for i = 1:numParticles
     particles(i).drawBot(3);
 end
 drawnow;
-nxt.close();
-
 
 clf
 botGhost.drawMap()
