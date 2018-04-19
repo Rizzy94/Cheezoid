@@ -230,8 +230,8 @@ for i = 1:(numScans)
     %score(i) = sum(abs( orientationScan - circshift( ghostScan, i ) ));
 end
 [minScanVal, minScanInd] = min(score);
-bestAng = ((minScanInd-1)/numScans)*(2*pi);% + pi;    %added plus pi (it's dubious, check)
-botGhost.setBotAng(bestAng);
+estAngle = ((minScanInd-1)/numScans)*(2*pi);% + pi;    %added plus pi (it's dubious, check)
+botGhost.setBotAng(estAngle);
 %disparity = mean (abs( circshift(distances(:,i),shift) - botScan ));
             
 %estAng = bestAng;
