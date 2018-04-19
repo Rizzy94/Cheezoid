@@ -1,0 +1,12 @@
+array = [0 0 0 0 1 1 1 0 0 0 1 1]
+n = 6
+run = 0;
+while true
+    if array(n)
+        run = run +1;
+        n = mod(n +1, length(array)
+    else
+        break
+    end
+end
+run

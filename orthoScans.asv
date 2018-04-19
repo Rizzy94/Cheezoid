@@ -1,5 +1,17 @@
 function oScans = orthoScans(scan)
-numScan = leng
+numScan = length(scan)
+if mod(numScan, 4) ~= 0
+	warning('Number of scans not divisable by 4')
+end
+dist1, ind1 = min(scans)
+
+indices = zeros(numScan,1);
+for i = 1,4
+   indices(i) = mod(indi+(i*(numScans/4), numScans);
+end
+oScans = zeros(4,1)
+oScans = [scan(indices(1)); scan(indices(2)); scan(indices(3)); scan(indices(4))]; 
+
 
 
 
