@@ -35,7 +35,7 @@ classdef Robot < handle
         m3Cal = 1.0; %Calibration for motor 3 NOT NEEDED
         
         %power variables
-        pUltra = 40;    %ultra scanner power
+        pUltra = 20;    %ultra scanner power
         pTurn = 100;     %turning power
         pMove = 100;     %moving power
         
@@ -181,11 +181,15 @@ classdef Robot < handle
         %move
         function move(nxt, howFar)
             %allow for backwards movements
+            
+            % ADD FOLLOWING LINE DUE TO CHANGES MADE IN REDESIGN
+            howFar = -howFar;
+            
             movePow = nxt.pMove * sign(howFar);
             howFar = abs(howFar);
             %run the motors
             mA = NXTMotor('A', 'Power', movePow, 'TachoLimit', round(howFar/nxt.cmPerDeg)*nxt.m1Cal);
-            mB = NXTMotor('B', 'Power', movePow, 'TachoLimit', round(howFar/nxt.cmPerDeg))*nxt.m2Cal;
+            mB = NXTMotor('B', 'Power', movePow, 'TachoLimit', round(howFar/nxt.cmPerDeg)*nxt.m2Cal);
             mB.SpeedRegulation = false;
             mB.SmoothStart = true;
             mA.SpeedRegulation = false;

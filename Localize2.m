@@ -4,7 +4,7 @@ close all; %clears figures
 
 map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 
-numScans = 10;
+numScans = 100;
 startAngle = 0;
 endAngle = ((numScans-1)*2*pi)/numScans;  
 angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
@@ -45,8 +45,8 @@ while(converged == 0)
     n=n+1;
     scanA = nxt.rotScan(numScans); %TODO: simplify these 5 lines into 1 line
     pause(0.3)
-    scanB = nxt.rotScan(numScans);  
-    pause(0.3)
+    %scanB = nxt.rotScan(numScans);  
+    %pause(0.3)
     botScan = (scanA(:,1));% + scanB)/2; Not sure if this really will ever be needed now
 
     distances = zeros(size(scanLines,1), numParticles);
@@ -64,9 +64,13 @@ while(converged == 0)
         disparity = mean(abs(distances(:,i) - botScan)); 
         particleProbs(i) = exp(-(disparity^2 / (2 * sensorNoise))) + dampeningFact;
         particleShift(i) = 0;
-
+        scanAux = botScan;
+        scanAux(botScan == 255) = [];
+        
         for shift = 1:(size(scanLines,1)-1)
-            disparity = mean (abs( circshift(distances(:,i),shift) - botScan ));
+            shiftedScan = circshift(distances(:,i),shift);
+            shiftedScan(botScan == 255) = [];
+            disparity = mean (abs( circshift(shiftedScan,shift) - scanAux ));
             if (exp(-(disparity^2 / (2 * sensorNoise))) + dampeningFact) > particleProbs(i)
                 particleProbs(i) = exp(-(disparity^2 / (2 * sensorNoise))) + dampeningFact;
                 particleShift(i) = shift;
@@ -131,14 +135,14 @@ while(converged == 0)
     if converged == 0
 
         move = 10;   %4
-        if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 2*move) == 0
+        if prod(botScan([1:round(numScans/5), (size(botScan,1)-round(numScans/5)):size(botScan,1)]) > 2*move) == 0
             foundRoute = 0;
             while foundRoute == 0
                 nxt.turn(pi/2);
                 scanA = nxt.rotScan(numScans);
                 pause(0.3)
-                scanB = nxt.rotScan(numScans);  
-                pause(0.3)
+                %scanB = nxt.rotScan(numScans);  
+                %pause(0.3)
                 botScan = (scanA(:,1));% + scanB)/2;
                 if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 2*move) == 1
                     foundRoute = 1;
