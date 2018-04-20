@@ -152,19 +152,18 @@ while(converged == 0)
 
         move = 10;   %4
         %if prod(botScan([1:round(numScans/6), (size(botScan,1)-round(numScans/6)):size(botScan,1)]) > 1.2*move) == 0
-        %if isOrthog == 0
-        %    nxt.turn(angleToTurn);
-        %    isOrthog = 1;
-        %end
+        if isOrthog == 0
+            nxt.turn(angleToTurn);
+            isOrthog = 1;
+        end
         if (botScan(1) > 2*move) == 0
             foundRoute = 0;
             while foundRoute == 0
-                nxt.turn(pi/2 + angleToTurn*(1-isOrthog));
-                isOrthog = 1;
+                nxt.turn(pi/2);
                 %scanA = nxt.rotScanStopStart(numScans);
                 scanA = nxt.rotScan(numScansFull);
                 [ang, scanA] = orthoScans(scanA);
-                %nxt.turn(ang);
+                nxt.turn(ang);
                 botScan = (scanA(:,1));% + scanB)/2;
                 %if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 1.5*move) == 1
                 if (botScan(1) > 2*move) == 1

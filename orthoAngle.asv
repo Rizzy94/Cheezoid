@@ -15,7 +15,7 @@ if sum(auxInd) == 1                     %if the minimum is unique do this
 end
 if sum(auxInd) > 1
     [ind, runLength] = longestRun(auxInd);
-    minInd = mod(ind + (runLength-1)/2, length(auxInd));
+    minInd = ind + runLength/2
     numScan = length(scanAux);
 
     angle = ((minInd-1)/numScan)*(2*pi);
