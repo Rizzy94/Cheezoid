@@ -26,23 +26,23 @@ goalPos = [40 32];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKW
     
     % these while loops may not be the most elegant setup.
 
-%while lost == 0 
+while lost == 0 
    [pathCoord,pathLength] = PathPlanning(nxt.pos,goalPos,map,plotit);
    [pathCoord,pathLength] = pathShortening(pathCoord,pathLength,map);
     i = 1;
     nxt.pos = pathCoord(1,:);
-    while arrived == 0 && lost == 0 
+    while arrived == 0 && lost == 0 && offPath == 0
         to = pathCoord(i+1,:);
-        [nxt,arrived,lost] = pathFollow(nxt,to,goalPos);
+        [nxt,arrived,lost,offPath] = pathFollow(nxt,to,goalPos);
         if i == pathLength-1
             break
         end
-        i= i + 1
+        i = i + 1
     end
     
-%     if arrived == 1
-%        % break
-%     end
-%end
+    if arrived == 1
+        break %and also out of the localisation loop as well
+    end
+end
 
 

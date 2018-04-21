@@ -1,4 +1,6 @@
-function [nxt,arrived,lost] = pathFollow(nxt, to, goalPos)
+function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos)
+    % arrived is "at goal",lost means estimate is shit, offPath means good
+    % estimate but too far off planned route, so replan
     map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
     lost = 0;
     from = nxt.pos;
@@ -51,19 +53,53 @@ function [nxt,arrived,lost] = pathFollow(nxt, to, goalPos)
          CheckBots(i) = BotSim(map);
          CheckBots(i).setBotPos(from); % ideal bot or current estimate?
          CheckBots(i).setBotAng(angle);
+         CheckBots(i).setScanConfig(CheckBots.getScanConfig(30));
     end
 
     %set them to positions corresponding to movement and turn angle
     turnNoise = 0.3*turnAngle;
     moveNoise = 0.3*moveDist;
     
+    oScans = zeros(4,checkBotsNmum);
+    
     for i = 1:checkBotsNum
         CheckBots(i).turn(normrnd(turnAngle,turnNoise));
         CheckBots(i).move(normrnd(moveDist,moveNoise));
-        
+        % take scans and collect orthoscans
+        scan = CheckBots(i).ultraScan();
+        [~, oScans(:,i)] = orthoScans(scan);
     end
 
     %perform a scan, take the orthogonals compare to orthogonal particles
+    
+    nxtScan = nxt.rotScan(30);
+    [~,nxtOrthoScan] = orthoScans(nxtScan);
+    
+    diff = zeros(4,checkBotsNum);
+    prob = zeros(1,checkBotsNum);
+
+    for i = 1:checkBotsNum
+        diff(:,i) = abs(nxtOrthoScan - oScans(:,i));
+        prob(1,i) = prod(normpdf(diff(:,i),0,4));       
+    end
+    
+    [~,I] = max(prob);
+    
+    if sum(diff(:,I)) < 20
+        nxt.pos = CheckBots(I).getBotPos();
+        nxt.ang = CheckBots(I).getBotAng();
+    else
+        disp('NXT is lost, relocalise')
+        lost = 1;
+        return
+    end
+    
+    if sum(nxt.pos - to) > 5
+        lost = 0;
+        arrived = 0;
+        offPath = 1;
+        return
+    end
 
     %update nxt.pos & nxt.ang
     %check if arrived.
