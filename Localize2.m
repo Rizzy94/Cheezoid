@@ -16,7 +16,7 @@ dampeningFact = 0.00000001;
 redistPercentage = 0.75;
 sensorNoise = 1; 
 isOrthog = 0;
-numParticles = 1500; 
+numParticles =2000; 
 
 particles(numParticles,1) = BotSim; %how to set up a vector of objects
 for i = 1:numParticles
@@ -25,7 +25,7 @@ for i = 1:numParticles
     particles(i).setSensorNoise(0);
     particles(i).setMotionNoise(0);
     particles(i).setTurningNoise(0);
-    particles(i).randomPose(10); %spawn the particles in random locations
+    particles(i).randomPose(5); %spawn the particles in random locations
     particles(i).setBotAng(floor(rand*4)*pi/2)
 end
 
@@ -36,7 +36,7 @@ for i = 1:numParticles
     newParticles(i).setSensorNoise(0);
     newParticles(i).setMotionNoise(0);
     newParticles(i).setTurningNoise(0);
-    newParticles(i).randomPose(10); %spawn the particles in random locations
+    newParticles(i).randomPose(5); %spawn the particles in random locations
     newParticles(i).setBotAng(floor(rand*4)*pi/2)
 end
 
@@ -45,20 +45,18 @@ nxt.beep(440, 200); %Beep beep
 n = 0;
 
 prevPow = nxt.pUltra;
-nxt.pUltra = 20;
-scan = nxt.rotScan(72);
-[angleToTurn, ~] = orthoAngle(scan);
+nxt.pUltra = 25;
+scanA = nxt.rotScan(72);
+[angleToTurn, ~] = orthoAngle(scanA);
 %nxt.turn(angletoTurn);
 nxt.pUltra = prevPow;
 
-[a, b] = orthoScans(scan);
-b;
 %nxt.turn(a);
 
 while(converged == 0)
     n=n+1;
     %scanA = nxt.rotScanStopStart(numScans); %TODO: simplify these 5 lines into 1 line
-    botScan = nxt.rotScan(numScansFull);
+    scanA = nxt.rotScan(numScansFull);
     [angToTurn, botScan] = orthoScans(botScan);
     pause(0.3)
     %botScan = (scanA(:,1));% + scanB)/2; Not sure if this really will ever be needed now
@@ -110,14 +108,14 @@ while(converged == 0)
         keep = size(particleDist(particleDist<rand),1) + 1;
         newParticles(i).setBotPos( particles(keep).getBotPos() + (randn(2,1)/2)');
         %newParticles(i).setBotAng( mod(particles(keep).getBotAng() + pi/size(scanLines,1) , 2*pi) + randn(1)/10)
-        newParticles(i).setBotAng( mod(particles(keep).getBotAng() , 2*pi) + randn(1)/10)
+        newParticles(i).setBotAng( particles(keep).getBotAng() + randn(1)/10)
         particlePositions(i,:) = getBotPos(newParticles(i));
     end   
 
     %bestAng = getBotAng(newParticles(maxProbParticleInd));
     
     for i = (round(numParticles*redistPercentage)+1):numParticles
-        newParticles(i).randomPose(10);
+        newParticles(i).randomPose(5);
         newParticles(i).setBotAng((floor(rand*4)*pi/2))
     end
 
@@ -150,43 +148,43 @@ while(converged == 0)
     
     if converged == 0
 
-        move = 10;   %4
+        move = 15;   %4
         %if prod(botScan([1:round(numScans/6), (size(botScan,1)-round(numScans/6)):size(botScan,1)]) > 1.2*move) == 0
-        %if isOrthog == 0
-        %    nxt.turn(angleToTurn);
-        %    isOrthog = 1;
-        %end
-        if (botScan(1) > 2*move) == 0
+        if isOrthog == 0
+           nxt.turn(angleToTurn);
+           isOrthog = 1;
+           scanA = nxt.rotScan(4);
+        end
+        if (scanA(1) < 2*move)
             foundRoute = 0;
             while foundRoute == 0
-                nxt.turn(pi/2 + angleToTurn*(1-isOrthog));
-                isOrthog = 1;
+                nxt.turn(pi/2);
                 %scanA = nxt.rotScanStopStart(numScans);
                 scanA = nxt.rotScan(numScansFull);
-                [ang, scanA] = orthoScans(scanA);
+                [ang, botScan] = orthoScans(scanA);
                 %nxt.turn(ang);
-                botScan = (scanA(:,1));% + scanB)/2;
+                %botScan = (scanA(:,1));% + scanB)/2;
                 %if prod(botScan([1:5, (size(botScan,1)-5):size(botScan,1)]) > 1.5*move) == 1
-                if (botScan(1) > 2*move) == 1
+                if (scanA(1) > 2*move)
                     foundRoute = 1;
                 end
                 for i =1:numParticles %for all the particles. 
-                    particles(i).turn(pi/2 + randn/2.5); %turn the particle in the same way as the real robot
+                    particles(i).turn(-pi/2 + randn/2.5); %turn the particle in the same way as the real robot
                 end
             end
         end
         nxt.move(move);
-        for i =1:round(numParticles/2) %for half the particles. 
+        for i =1:round(numParticles/1.25) %for half the particles. 
             particles(i).move( move + randn ); %move the particle with some noise
             if particles(i).insideMap() == 0
-                particles(i).randomPose(10);
+                particles(i).randomPose(5);
                 particles(i).setBotAng((floor(rand*4)*pi/2))
             end
         end
-        for i = (round(numParticles/2) + 1):numParticles %for the other half the particles. 
+        for i = (round(numParticles/1.25) + 1):numParticles %for the other half the particles. 
             particles(i).move( move*rand ); %move the particle less than the bot was supposed to move
             if particles(i).insideMap() == 0
-                particles(i).randomPose(10);
+                particles(i).randomPose(5);
                 particles(i).setBotAng(floor(rand*4)*pi/2)
             end
         end
@@ -212,7 +210,7 @@ end
 
 estPosition = mean(particlePositions);
 
-numScans = 60;
+numScans = 72;
 startAngle = 0;
 endAngle = ((numScans-1)*2*pi)/numScans;  
 angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
@@ -226,14 +224,14 @@ botGhost.setTurningNoise(0);
 botGhost.setBotPos(estPosition); %spawn the particles in random locations
 botGhost.setBotAng(0);
 prevPow = nxt.pUltra;
-nxt.pUltra = 20;
+nxt.pUltra = 25;
 orientationScan = nxt.rotScan(numScans);
 nxt.pUltra = prevPow;
 ghostScan = botGhost.ultraScan();
 score = zeros(numScans,1);
 for i = 1:(numScans)
     auxScan = circshift( ghostScan, -i ) ;  %CHANGED i TO -i
-    score(i) = sum(abs( orientationScan(orientationScan>10) - auxScan(orientationScan>10) ));
+    score(i) = sum(abs( orientationScan(orientationScan>=9) - auxScan(orientationScan>=9) ));
     %score(i) = sum(abs( orientationScan - circshift( ghostScan, i ) ));
 end
 [minScanVal, minScanInd] = min(score);
