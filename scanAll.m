@@ -12,10 +12,10 @@ function [nxtScan, botScan] = scanAll(nxt, bot, numScans)
     %4. Set the botSim objects to scan at these angles
     scanLines =  [cos(angles); sin(angles)]'*100;
     scanOffSet = [0 0]; %offset in x,y from wheelbase
-    botScan = zeros(length(bot), 1);
+    botScan = zeros(length(bot), 4);
     for i = 1:length(bot)
         bot(i).setScanConfig(scanLines,scanOffSet);
-        botScan(i) = bot(i).ultraScan;
+        botScan(i,:) = bot(i).ultraScan;
     end
     
     nxtScan = rScan; %maaaayyybee, not sure if the vector is in right order vs botscan

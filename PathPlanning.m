@@ -1,7 +1,7 @@
 function [pathCoord,pathLength] = PathPlanning(botPos,goalPos,map,plotit)
 
 plotBot = BotSim(map);
-plotBot.setMap(map);
+%plotBot.setMap(map);
 plotBot.setBotPos(botPos);
 g = BotSim(map);
 g.setBotPos(goalPos);
@@ -225,6 +225,7 @@ end
 if plotit == 1
     figure(1)
     hold on
+    plotBot.drawMap();
     plotBot.drawBot(10,'r');
     g.drawBot(5,'b')
     plot(pathCoord(:,2),pathCoord(:,1),'-');

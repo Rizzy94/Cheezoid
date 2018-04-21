@@ -10,8 +10,8 @@ arrived = 0;
 
 nxt = Robot();
 nxt.ang = pi/2;
-nxt.pos = [90 90];
-goalPos = [40 20];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
+nxt.pos = [40 20];
+goalPos = [60 80];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
 
 
 %% Actually using them
@@ -34,10 +34,9 @@ goalPos = [40 20];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKW
     while arrived == 0 && lost == 0 
         to = pathCoord(i+1,:);
         [nxt,arrived,lost] = pathFollow(nxt,to,goalPos);
-        if i == pathLength-1
+        if i = pathLength-1
             break
-        end
-        i= i + 1
+        i=+1
     end
     
 %     if arrived == 1
