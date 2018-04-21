@@ -11,7 +11,7 @@ arrived = 0;
 nxt = Robot();
 nxt.ang = pi/2;
 nxt.pos = [90 90];
-goalPos = [40 20];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
+goalPos = [40 32];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
 
 
 %% Actually using them
