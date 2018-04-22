@@ -9,15 +9,16 @@ checkBot.setScanConfig(checkBot.generateScanConfig(orientAngles));
 shortPath = [pathCoord(1,:)];
 
 coordNum = 1;
-
+if ~safePath(checkBot, pathCoord(1,:),  pathCoord(2,:)) %Say if this is one
+            warning('Starting from too close to wall, please update pathShortening.m to cope. This could cause crashes')
+            shortPath = [shortPath; pathCoord(2,:)];
+            coordNum = coordNum + 1;
+end
 
 while true
     from = shortPath(end,:); %good
     for i = coordNum+1:size(pathCoord,1)    
         if safePath(checkBot, from, pathCoord(i,:)) && distance(from,pathCoord(i,:)) < 30
-            to = pathCoord(i,:);
-        elseif ~safePath(checkBot, pathCoord(1,:),  pathCoord(2,:)) %Say if this is one
-            warning('Starting from too close to wall, please update pathShortening.m to cope. This could cause crashes')
             to = pathCoord(i,:);
         else
             coordNum = i - 1;
