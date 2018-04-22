@@ -8,8 +8,8 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos)
     xDif = to(1)-from(1);
     yDif = to(2)-from(2);
     % moveDist = sqrt((xDif^2) + (yDif^2))
-    moveDist = distance(nxt.pos, to)
-    angle = atan2(yDif,xDif)
+    moveDist = distance(nxt.pos, to);
+    angle = atan2(yDif,xDif);
             
     idealBot = BotSim(map);
     idealBot.setBotPos(nxt.pos);
@@ -49,18 +49,25 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos)
     %initalise the particles
     checkBotsNum = 500;
     CheckBots(checkBotsNum,1) = BotSim;
+    numScans = 32;
+    startAngle = 0;
+    endAngle = ((numScans-1)*2*pi)/numScans;  
+    angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
+    scanLines =  [cos(angles); sin(angles)]'*100;
+    scanOffSet = [0, 0];
     for i = 1:checkBotsNum
          CheckBots(i) = BotSim(map);
          CheckBots(i).setBotPos(from); % ideal bot or current estimate?
          CheckBots(i).setBotAng(angle);
-         CheckBots(i).setScanConfig(CheckBots.getScanConfig(30));
+         
+        CheckBots(i).setScanConfig(scanLines,scanOffSet);
     end
 
     %set them to positions corresponding to movement and turn angle
     turnNoise = 0.3*turnAngle;
     moveNoise = 0.3*moveDist;
     
-    oScans = zeros(4,checkBotsNmum);
+    oScans = zeros(4,checkBotsNum);
     
     for i = 1:checkBotsNum
         CheckBots(i).turn(normrnd(turnAngle,turnNoise));

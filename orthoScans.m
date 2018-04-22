@@ -16,7 +16,6 @@ function [ang, oScans] = orthoScans(scan)
            indices(i) = length(scan);
        end
     end
-    disp(indices);
     oScans = [scan(indices(1)); scan(indices(2)); scan(indices(3)); scan(indices(4))]; 
     oScans = circshift(oScans, 1);
 end

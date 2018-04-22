@@ -7,12 +7,15 @@ plotit = 1;
 samples = 30;
 lost = 0;
 arrived = 0;
+offPath = 0;
 
 nxt = Robot();
-nxt.ang = pi/2;
-nxt.pos = [90 90];
-goalPos = [40 32];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
-
+%nxt.ang = pi/2;
+%nxt.pos = [90 90];
+nxt.pos = estPosition;
+nxt.ang = bestAng;
+%goalPos = [40 32];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
+goalPos = [80 80];
 
 %% Actually using them
     %so this should plan a path, and then try to execute said path.
