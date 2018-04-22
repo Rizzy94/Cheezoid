@@ -30,6 +30,7 @@ goalPos = [80 80];
     % these while loops may not be the most elegant setup.
 
 while lost == 0 
+    offPath = 0;
    [pathCoord,pathLength] = PathPlanning(nxt.pos,goalPos,map,plotit);
    [pathCoord,pathLength] = pathShortening(pathCoord,pathLength,map);
    disp('Path planned and shortened')
@@ -37,12 +38,12 @@ while lost == 0
     nxt.pos = pathCoord(1,:);
     while arrived == 0 && lost == 0 && offPath == 0
         to = pathCoord(i+1,:);
-        [nxt,arrived,lost,offPath] = pathFollow(nxt,to,goalPos);
+        [nxt,arrived,lost,offPath] = pathFollow(nxt,to,goalPos, true);
         disp('Step performed')
         if i == pathLength-1
             break
         end
-        i = i + 1
+        i = i + 1;
     end
     
     if arrived == 1

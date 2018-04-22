@@ -304,4 +304,4 @@ botGhost.drawBot(10);
 drawnow;
 nxt.close();
 
-%PlanAndFollow;
+PlanAndFollow;
