@@ -1,7 +1,7 @@
 function [pathCoord,pathLength] = PathPlanning(botPos,goalPos,map,plotit)
 
 plotBot = BotSim(map);
-plotBot.setMap(map);
+%plotBot.setMap(map);
 plotBot.setBotPos(botPos);
 g = BotSim(map);
 g.setBotPos(goalPos);
@@ -69,10 +69,11 @@ while v == 0    % path planning
     sizMap2 = size(mapArray2);
 
     %% Shrink the map to avoid leaving it
+    mapShrunk1 = zeros(sizMap2(1),sizMap2(2)); % Same size as mapArray2
     mapShrunk = zeros(sizMap2(1),sizMap2(2)); % Same size as mapArray2
 
     nb = 0;      % Number of neighbours to a point that are within the map
-    %for g = 1:2
+    
     for i = 2:sizMap2(2)-1 %over x. leave the edges so neighbours check works. (edges are black anyway)
         for j = 2:sizMap2(1)-1  %over y
             if mapArray2(j,i) == 1
@@ -84,16 +85,37 @@ while v == 0    % path planning
                end
                if sum(nb) == 9          % If a point is at an edge, it is discarded
 
-                   mapShrunk(j-1,i-1) = 1;  %SO I THINK THIS SHUFFLES MAPSHRUNK BACK BY -1, NEGATING THE SHIFT FOR MAPARRAY2
+                   mapShrunk1(j-1,i-1) = 1;  %SO I THINK THIS SHUFFLES MAPSHRUNK BACK BY -1, NEGATING THE SHIFT FOR MAPARRAY2
                    if plotit == 1
-                        tester.drawMap();
-                        plot(res*(i-2)+limsMin(1),res*(j-2)+limsMin(2),'o','MarkerEdgeColor',[0,0,0]) % -1 for starting at 1, -1 for the shift above
+                        %tester.drawMap();
+                        %plot(res*(i-2)+limsMin(1),res*(j-2)+limsMin(2),'o','MarkerEdgeColor',[0,0,0]) % -1 for starting at 1, -1 for the shift above
                    end
                end
             end
         end
     end
+    % shrink again
+    for i = 2:sizMap2(2)-1 %over x. leave the edges so neighbours check works. (edges are black anyway)
+        for j = 2:sizMap2(1)-1  %over y
+            if mapShrunk1(j,i) == 1
+                nb = 0;
+               for k = 1:3
+                   for m = 1:3
+                       nb = nb + mapShrunk1(j-2+m,i-2+k);
+                   end
+               end
+               if sum(nb) == 9          % If a point is at an edge, it is discarded
 
+                   mapShrunk(j,i) = 1;  %SO I THINK THIS SHUFFLES MAPSHRUNK BACK BY -1, NEGATING THE SHIFT FOR MAPARRAY2
+                   if plotit == 1
+                        tester.drawMap();
+                        plot(res*(i-1)+limsMin(1),res*(j-1)+limsMin(2),'o','MarkerEdgeColor',[0,0,0]) % -1 for starting at 1, -1 for the shift above
+                   end
+               end
+            end
+        end
+    end
+    
     if plotit == 1
         pause(1);
     end
@@ -225,8 +247,9 @@ end
 if plotit == 1
     figure(1)
     hold on
+    plotBot.drawMap();
     plotBot.drawBot(10,'r');
-    g.drawBot(5,'b')
+    %g.drawBot(5,'b')
     plot(pathCoord(:,2),pathCoord(:,1),'-');
     drawnow();
     pause(1);

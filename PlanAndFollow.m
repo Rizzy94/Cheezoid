@@ -4,14 +4,18 @@
 map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 plotit = 1;
 
-botPos = [87 87];
-% botPos = [45 22];       % will come from localise
-botAng = 0;    % PRETTY SURE IT THINKS PI/2 IS PARALLEL WITH THE POSITIVE X AXIS. WHY? GREAT QUESTION
-goalPos = [30 40];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
-samples = 30;
+samples = 32;
 lost = 0;
 arrived = 0;
+offPath = 0;
+
 nxt = Robot();
+%nxt.ang = pi/2;
+%nxt.pos = [90 90];
+nxt.pos = estPosition;
+nxt.ang = bestAng;
+%goalPos = [40 32];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
+goalPos = [80 80];
 
 %% Actually using them
     %so this should plan a path, and then try to execute said path.
@@ -25,17 +29,27 @@ nxt = Robot();
     
     % these while loops may not be the most elegant setup.
 
-%while lost == 0 
-    [pathCoord,pathLength] = PathPlanning(botPos,goalPos,map,plotit);
-%     [pathCoord,pathLength] = pathShortening(pathCoord,pathLength,[0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]);
-    
-    while arrived == 0 && lost == 0 
-        [botPos,botAng,arrived,lost] = FollowPath(nxt, pathCoord,botPos,botAng,pathLength,samples,map,plotit);
+while lost == 0 
+    offPath = 0;
+   [pathCoord,pathLength] = PathPlanning(nxt.pos,goalPos,map,plotit);
+   [pathCoord,pathLength] = pathShortening(pathCoord,pathLength,map);
+   disp('Path planned and shortened')
+    i = 1;
+    nxt.pos = pathCoord(1,:);
+    while arrived == 0 && lost == 0 && offPath == 0
+        to = pathCoord(i+1,:);
+        [nxt,arrived,lost,offPath] = pathFollow(nxt,to,goalPos, true);
+        disp('Step performed')
+        if i == pathLength-1
+            break
+        end
+        i = i + 1;
     end
     
     if arrived == 1
-       % break
+        disp('NXT at goal, break out of while loop')
+        break %and also out of the localisation loop as well
     end
-%end
+end
 
 

@@ -1,8 +1,10 @@
-function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos)
+function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos, plotMe)
     % arrived is "at goal",lost means estimate is shit, offPath means good
     % estimate but too far off planned route, so replan
     map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
     lost = 0;
+    offPath = 0;
+    arrived = 0;
     from = nxt.pos;
     %work out the distance and angle between from and to
     xDif = to(1)-from(1);
@@ -47,7 +49,7 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos)
     %check particles
     
     %initalise the particles
-    checkBotsNum = 500;
+    checkBotsNum = 2000;
     CheckBots(checkBotsNum,1) = BotSim;
     numScans = 32;
     startAngle = 0;
@@ -74,6 +76,7 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos)
     for i = 1:checkBotsNum
         CheckBots(i).turn(normrnd(turnAngle,abs(turnNoise)));
         CheckBots(i).move(normrnd(moveDist,abs(moveNoise)));
+        CheckBots(i).turn(randn/20);
         % take scans and collect orthoscans
         if CheckBots(i).insideMap() == 1
             scan = CheckBots(i).ultraScan();
@@ -104,7 +107,11 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos)
 %        disp('NXT is lost, relocalise')
 %        lost = 1;
 %     end
-    
+    if plotMe == true
+        idealBot.setBotPos(nxt.pos);
+        idealBot.setBotAng(nxt.ang);
+        idealBot.drawBot(5);
+    end
     
     if sum(nxt.pos - to) > 10
         lost = 0;

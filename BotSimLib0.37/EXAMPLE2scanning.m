@@ -103,6 +103,7 @@ startAngle =-pi/4
 endAngle = pi/4
 samples = 5
 angles= (startAngle:(endAngle - startAngle)/(samples-1):endAngle)
+% angles= [1, 1.1, 2, 2.5, 3.0, 3.3, 3.4, 3.45]
 input('Then press enter to generate radial lines based on the generated angles');
 disp('-------------------------------------------------------------------');
 disp(' ');

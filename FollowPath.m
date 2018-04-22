@@ -49,6 +49,7 @@ end
      % movement then don't do it? Probs have to relocalise
      if plotit == 1
          figure(3)
+         
          CurrentBotEstimate.drawMap();
          CurrentBotEstimate.drawBot(20,'r');
      end
@@ -114,6 +115,8 @@ end
      % add in an if statement for incase the best one is shit
      CurrentBotEstimate.setBotPos(CheckBots(I4(checkBotsNum)).getBotPos());     % I4(checkBotsNum) is the last entry in the array, and is the position of the best scan in scanProb2
      CurrentBotEstimate.setBotAng(CheckBots(I4(checkBotsNum)).getBotAng());
+     
+
      [estimateScan,~] = CurrentBotEstimate.ultraScan();
      %if sum(abs(CurrentBotEstimate.getBotPos() - IdealBot.getBotPos())) > 20 % if we're too far from the ideal bot, re plan
       

@@ -98,6 +98,7 @@ classdef Robot < handle
         function dist = scan(~, num)
             dist = zeros(num, 1);
             for i = 1:num
+                pause(0.1);
                 dist(i) = GetUltrasonic(SENSOR_1);
                 pause(0.1);
             end
