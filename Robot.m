@@ -7,7 +7,8 @@ classdef Robot < handle
         pos;    %position of the robot
         ang;    %angle of the robot (radians)
         dir;    %angle of the robot (stored as 2d vector)
-        map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map;    %map coordinates with a copy of the first coordiantes at the end
+%         map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map;  
+        map = [0,0;66,0;66,44;44,44;44,66;110,66;110,110;0,110]; %more accurate map;%map coordinates with a copy of the first coordiantes at the end
         mapLines;   %The map stored as a list of lines (for easy line interection)
         inpolygonMapformatX; %The map stored as a polygon for the insidepoly function
         inpolygonMapformatY; %The map stored as a polygon for the insidepoly function

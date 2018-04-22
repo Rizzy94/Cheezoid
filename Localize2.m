@@ -1,9 +1,9 @@
 clf('reset'); %resets figures 
 clc;        %clears console
 close all; %clears figures
-
-map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
-
+nxt = Robot(); 
+% map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
+map = nxt.map;
 numScans = 4;
 numScansFull = 32;
 startAngle = 0;
@@ -40,7 +40,7 @@ for i = 1:numParticles
     newParticles(i).setBotAng(floor(rand*4)*pi/2);
 end
 
-nxt = Robot(); %creates robot object
+%creates robot object
 nxt.beep(440, 200); %Beep beep
 n = 0;
 

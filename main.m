@@ -1,7 +1,7 @@
 %% Combining PathPlanning.m and FollowPath.m - probably to be inserted into the full robot script later
 tic
 %% All the setup needed for these two functions
-map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
+% map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 plotit = 1;
 goalPos = [80 80];
 
@@ -11,7 +11,7 @@ arrived = 0;
 offPath = 0;
 
 nxt = Robot();
-
+map = nxt.map;
 [estPosition, bestAng] = Localize(nxt, 2000, true);
 
 nxt.pos = estPosition;

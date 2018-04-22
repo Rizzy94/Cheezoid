@@ -1,7 +1,8 @@
 function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos, plotMe)
     % arrived is "at goal",lost means estimate is shit, offPath means good
     % estimate but too far off planned route, so replan
-    map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
+%     map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
+    map = nxt.map;
     lost = 0;
     offPath = 0;
     arrived = 0;

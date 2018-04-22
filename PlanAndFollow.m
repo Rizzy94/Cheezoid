@@ -2,6 +2,7 @@
 
 %% All the setup needed for these two functions
 map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
+map = [0,0;66,0;66,44;44,44;44,66;110,66;110,110;0,110];
 plotit = 1;
 
 samples = 32;
