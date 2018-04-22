@@ -15,7 +15,7 @@ while v == 0    % path planning
     tester.setMap(map);
     leaves = 0;
     dist = ceil(sqrt((startPos(1)-goalPos(1))^2 + (startPos(2)-goalPos(2))^2));
-    if dist < 20
+    if dist < 30
         interpolPointsX = linspace(startPos(1),goalPos(1),dist)';
         interpolPointsY = linspace(startPos(2),goalPos(2),dist)';
         interpolPoints = [interpolPointsX, interpolPointsY];
@@ -243,7 +243,7 @@ while v == 0    % path planning
     break
 end
     % A* and simple path planning converge here
-[pathLength,~] = size(pathCoord);
+[pathLength,~] = size(pathCoord,1);
 if plotit == 1
     figure(1)
     hold on
