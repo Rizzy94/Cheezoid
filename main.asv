@@ -1,8 +1,9 @@
 %% Combining PathPlanning.m and FollowPath.m - probably to be inserted into the full robot script later
-
+tic
 %% All the setup needed for these two functions
 map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 plotit = 1;
+goalPos = [20 81];
 
 samples = 32;
 lost = 0;
@@ -10,12 +11,11 @@ arrived = 0;
 offPath = 0;
 
 nxt = Robot();
-%nxt.ang = pi/2;
-%nxt.pos = [90 90];
+
+[estPosition, bestAng] = Localize(nxt, 2000, true);
+
 nxt.pos = estPosition;
 nxt.ang = bestAng;
-%goalPos = [40 32];      % SO ITS MEASURING ITS ANGLE FROM THE Y AXIS IN A CLOCKWISE DIRECTION
-goalPos = [80 80];
 
 %% Actually using them
     %so this should plan a path, and then try to execute said path.
@@ -30,22 +30,26 @@ goalPos = [80 80];
     % these while loops may not be the most elegant setup.
 
 while lost == 0 
-   [pathCoord,pathLength] = PathPlanning(nxt.pos,goalPos,map,plotit);
+   [pathCoord,pathLength] = PathPlanning2(nxt.pos,goalPos,map,plotit);
    [pathCoord,pathLength] = pathShortening(pathCoord,pathLength,map);
+   disp('Path planned and shortened')
     i = 1;
     nxt.pos = pathCoord(1,:);
-    while arrived == 0 
+    while arrived == 0 && lost == 0 && offPath == 0
         to = pathCoord(i+1,:);
-        [nxt,arrived,lost,offPath] = pathFollow(nxt,to,goalPos);
+        [nxt,arrived,lost,offPath] = pathFollow(nxt,to,goalPos, true);
+        disp('Step performed')
         if i == pathLength-1
             break
         end
-        i = i + 1
+        i = i + 1;
     end
     
     if arrived == 1
+        disp('NXT at goal, break out of while loop')
         break %and also out of the localisation loop as well
     end
 end
 
-
+toc
+nxt.beep(440,200)

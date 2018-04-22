@@ -3,7 +3,7 @@ tic
 %% All the setup needed for these two functions
 map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 plotit = 1;
-goalPos = [80 80];
+goalPos = [80, 80];
 
 samples = 32;
 lost = 0;
@@ -30,7 +30,8 @@ nxt.ang = bestAng;
     % these while loops may not be the most elegant setup.
 
 while lost == 0 
-   [pathCoord,pathLength] = PathPlanning(nxt.pos,goalPos,map,plotit);
+    offPath = 0;
+   [pathCoord,pathLength] = PathPlanning2(nxt.pos,goalPos,map,plotit);
    [pathCoord,pathLength] = pathShortening(pathCoord,pathLength,map);
    disp('Path planned and shortened')
     i = 1;
