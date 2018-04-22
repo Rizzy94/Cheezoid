@@ -18,7 +18,7 @@ end
 while true
     from = shortPath(end,:); %good
     for i = coordNum+1:size(pathCoord,1)    
-        if safePath(checkBot, from, pathCoord(i,:)) && distance(from,pathCoord(i,:)) < 30
+        if safePath(checkBot, from, pathCoord(i,:)) && distance(from,pathCoord(i,:)) < 20
             to = pathCoord(i,:);
         else
             coordNum = i - 1;

@@ -15,8 +15,8 @@ scanOffSet = [0, 0];
 limsMin = min(map); % minimum limits of the map
 limsMax = max(map); % maximum limits of the map
 dims = limsMax-limsMin; %dimension of the map
-res = 3; %sampling resouloution in cm
-safety = 20;
+res = 4; %sampling resouloution in cm
+safety = 16;
 iterators = dims/res;
 iterators = ceil(iterators)+[1 1]; %to counteract 1 based indexing
 hold on
@@ -74,16 +74,6 @@ for i = 2:(size(discreteMapPoints(1,:), 2) - 2)
     end
 end
 
-minDist = distance(target , discreteMapPoints(:,1)');
-closestVertexToTarget = 1;
-for i = 2:(size(discreteMapPoints(1,:), 2) - 2)
-    if distance(target , discreteMapPoints(:,i)') < minDist
-        minDist = distance(target , discreteMapPoints(:,i)');
-        closestVertexToTarget = i;
-    end
-end
-
-
 possibleDirections = zeros(5, (size(discreteMapPoints(1,:), 2) - 2));  %up right down left target
 
 for i = 1:(size(discreteMapPoints(1,:), 2) - 2)
@@ -134,8 +124,8 @@ while numOpen > 0
 
     if sum(nodeCurrent' == target) == 2
         %We're there
-        break
-        %return
+        print('bbb')
+        %break
     end
 
     numSuccesors = sum(possibleDirections( :,currentNodeIndex ));
@@ -192,7 +182,7 @@ path = zeros(2, size(discreteMapPoints,2) + 2);
 path(:, 1) = target;
 lenPath = 1;
 home = false;
-currentStep = discreteMapPoints(:,closestVertexToTarget);
+currentStep = target';
 
 while home == false
     lenPath = lenPath + 1;
