@@ -59,7 +59,8 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos)
          CheckBots(i) = BotSim(map);
          CheckBots(i).setBotPos(from); % ideal bot or current estimate?
          CheckBots(i).setBotAng(startAng);
-         CheckBots(i).setScanConfig(scanLines,scanOffSet);
+         
+        CheckBots(i).setScanConfig(scanLines,scanOffSet);
     end
 
     %set them to positions corresponding to movement and turn angle

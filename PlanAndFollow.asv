@@ -32,13 +32,11 @@ goalPos = [80 80];
 while lost == 0 
    [pathCoord,pathLength] = PathPlanning(nxt.pos,goalPos,map,plotit);
    [pathCoord,pathLength] = pathShortening(pathCoord,pathLength,map);
-   disp('Path planned and shortened')
     i = 1;
     nxt.pos = pathCoord(1,:);
-    while arrived == 0 && lost == 0 && offPath == 0
+    while arrived == 0 
         to = pathCoord(i+1,:);
         [nxt,arrived,lost,offPath] = pathFollow(nxt,to,goalPos);
-        disp('Step performed')
         if i == pathLength-1
             break
         end
@@ -46,7 +44,6 @@ while lost == 0
     end
     
     if arrived == 1
-        disp('NXT at goal, break out of while loop')
         break %and also out of the localisation loop as well
     end
 end
