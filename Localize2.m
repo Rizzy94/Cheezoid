@@ -44,19 +44,23 @@ nxt = Robot(); %creates robot object
 nxt.beep(440, 200); %Beep beep
 n = 0;
 
+
 prevPow = nxt.pUltra;
 nxt.pUltra = 25;
 scanA = nxt.rotScan(72);
 [angleToTurn, botScan] = orthoScans(scanA);
 %nxt.turn(angletoTurn);
-nxt.pUltra = prevPow;
+while (sum(botScan < 9) > 0)
+    scanA = nxt.rotScan(72);
+    [angleToTurn, botScan] = orthoScans(scanA);
+end
 dangerZone = false;
-
 if ((40<(botScan(1)+botScan(3)) && (botScan(1)+botScan(3))<50)&&(100<(botScan(2)+botScan(4)) && (botScan(2)+botScan(4))<110))
     if (44<botScan(2) && botScan(2)<61)&&(44<botScan(4) && botScan(4)<61)
         dangerZone = true;
     end
 end
+nxt.pUltra = prevPow;
 
 if ((40<(botScan(2)+botScan(4)) && (botScan(2)+botScan(4))<50)&&(100<(botScan(1)+botScan(3)) && (botScan(1)+botScan(3))<110))
     if (44<botScan(1) && botScan(1)<61)&&(44<botScan(3) && botScan(3)<61)

@@ -4,7 +4,7 @@
 map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 plotit = 1;
 
-samples = 30;
+samples = 32;
 lost = 0;
 arrived = 0;
 offPath = 0;
