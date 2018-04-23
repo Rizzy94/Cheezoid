@@ -115,6 +115,8 @@ hasBeenOpen = zeros(1, size(discreteMapPoints,2));
 
 open(:,1) = startPoint;
 cameFrom(:,closestVertex) = estPosition;
+cameFrom(:,closestVertexToTarget) = target;
+
 
 costVect = repmat(size(discreteMapPoints,2),size(discreteMapPoints,2),1);
 costVect(sum(discreteMapPoints == startPoint,1) == 2) = 0;

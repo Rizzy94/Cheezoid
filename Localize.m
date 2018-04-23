@@ -160,12 +160,12 @@ while(converged == 0)
            isOrthog = 1;
            scanA = nxt.rotScan(4);
         end
-        if (scanA(1) < 4*move)
+        if (scanA(1) < 5*move)
             foundRoute = 0;
             while foundRoute == 0
                 nxt.turn(pi/2);
                 scanA = nxt.rotScan(numScansFull);
-                if (scanA(1) > 4*move)
+                if (scanA(1) > 5*move)
                     foundRoute = 1;
                 end
                 for i =1:numParticles %for all the particles. 

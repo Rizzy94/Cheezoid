@@ -77,7 +77,7 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos, plotMe)
     for i = 1:checkBotsNum
         CheckBots(i).turn(normrnd(turnAngle,abs(turnNoise)));
         CheckBots(i).move(normrnd(moveDist,abs(moveNoise)));
-        CheckBots(i).turn(randn/20);
+        %CheckBots(i).turn(randn/20);
         % take scans and collect orthoscans
         if CheckBots(i).insideMap() == 1
             scan = CheckBots(i).ultraScan();
@@ -87,7 +87,25 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos, plotMe)
 
     %perform a scan, take the orthogonals compare to orthogonal particles
     
-    nxtScan = nxt.rotScan(numScans);
+    numScans = 72;
+    startAngle = 0;
+    endAngle = ((numScans-1)*2*pi)/numScans;  
+    angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
+    scanLines =  [cos(angles); sin(angles)]'*100;
+    scanOffSet = [0, 0];
+    botGhost = BotSim(map);
+    botGhost.setScanConfig(scanLines,scanOffSet);
+    botGhost.setSensorNoise(0);
+    botGhost.setMotionNoise(0);
+    botGhost.setTurningNoise(0);
+    botGhost.setBotPos(nxt.pos); %spawn the particles in random locations
+    botGhost.setBotAng(0);
+    prevPow = nxt.pUltra;
+    nxt.pUltra = 25;
+    orientationScan = nxt.rotScan(numScans);
+    nxt.pUltra = prevPow;
+    
+    nxtScan = orientationScan;
     [~,nxtOrthoScan] = orthoScans(nxtScan);
     
     diff = zeros(4,checkBotsNum);
@@ -103,7 +121,20 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos, plotMe)
 %     if sum(diff(:,I)) < 20
 %        disp('Estimate is good, setting NXT estimated position to checkbot position')
     nxt.pos = CheckBots(I).getBotPos();
-    nxt.ang = CheckBots(I).getBotAng();
+    %nxt.ang = CheckBots(I).getBotAng();
+    
+    botGhost.setBotPos(nxt.pos)
+    ghostScan = botGhost.ultraScan();
+    score = zeros(numScans,1);
+    for i = 1:(numScans)
+        auxScan = circshift( ghostScan, -i ) ; 
+        score(i) = sum(abs( orientationScan(orientationScan>=9) - auxScan(orientationScan>=9) ));
+    end
+    [~, minScanInd] = min(score);
+    bestAng = ((minScanInd-1)/numScans)*(2*pi);
+    botGhost.setBotAng(bestAng);
+    nxt.ang = bestAng;
+    
 %     else
 %        disp('NXT is lost, relocalise')
 %        lost = 1;
@@ -125,7 +156,7 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos, plotMe)
     %update nxt.pos & nxt.ang
     %check if arrived.
     arrived = 0;
-    if distance(nxt.pos, goalPos) < 5
+    if distance(nxt.pos, goalPos) < 3
         lost = 0;
         offPath = 0;
         arrived = 1;

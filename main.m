@@ -3,7 +3,7 @@ tic
 %% All the setup needed for these two functions
 % map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 plotit = 1;
-goalPos = [88, 88];
+goalPos = [22,88];
 
 samples = 32;
 lost = 0;
@@ -12,7 +12,7 @@ offPath = 0;
 
 nxt = Robot();
 map = nxt.map;
-[estPosition, bestAng] = Localize(nxt, 500, true);
+[estPosition, bestAng] = Localize(nxt, 2000, true);
 
 nxt.pos = estPosition;
 nxt.ang = bestAng;
@@ -54,3 +54,6 @@ end
 
 toc
 nxt.beep(440,200)
+%mario(nxt)
+
+nxt.close()
