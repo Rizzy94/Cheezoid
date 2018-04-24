@@ -52,7 +52,7 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos, plotMe)
     %initalise the particles
     checkBotsNum = 2000;
     CheckBots(checkBotsNum,1) = BotSim;
-    numScans = 32;
+    numScans = 72;
     startAngle = 0;
     endAngle = ((numScans-1)*2*pi)/numScans;  
     angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
@@ -100,10 +100,7 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos, plotMe)
     botGhost.setTurningNoise(0);
     botGhost.setBotPos(nxt.pos); %spawn the particles in random locations
     botGhost.setBotAng(0);
-    prevPow = nxt.pUltra;
-    nxt.pUltra = 25;
     orientationScan = nxt.rotScan(numScans);
-    nxt.pUltra = prevPow;
     
     nxtScan = orientationScan;
     [~,nxtOrthoScan] = orthoScans(nxtScan);
@@ -124,14 +121,22 @@ function [nxt,arrived,lost,offPath] = pathFollow(nxt, to, goalPos, plotMe)
     %nxt.ang = CheckBots(I).getBotAng();
     
     botGhost.setBotPos(nxt.pos)
+    botGhost.setBotAng(CheckBots(I).getBotAng())
+    
     ghostScan = botGhost.ultraScan();
     score = zeros(numScans,1);
-    for i = 1:(numScans)
+    for i = [1:15,(numScans-15):numScans]
         auxScan = circshift( ghostScan, -i ) ; 
         score(i) = sum(abs( orientationScan(orientationScan>=9) - auxScan(orientationScan>=9) ));
     end
+    for i = 16:(numScans-14)
+        score(i) = max(score);
+    end
     [~, minScanInd] = min(score);
-    bestAng = ((minScanInd-1)/numScans)*(2*pi);
+    bestAng = ((minScanInd-1)/numScans)*(2*pi) + CheckBots(I).getBotAng();
+    if bestAng > pi
+    bestAng = bestAng - 2*pi; 
+    end
     botGhost.setBotAng(bestAng);
     nxt.ang = bestAng;
     

@@ -3,7 +3,7 @@ function [estPosition, bestAng] = Localize(nxt, numParticles, plotMe)
 map=nxt.map;
 
 numScans = 4;
-numScansFull = 32;
+numScansFull = 72;
 startAngle = 0;
 endAngle = ((numScans-1)*2*pi)/numScans;  
 angles = (startAngle:(endAngle - startAngle)/(numScans-1):endAngle);
@@ -14,7 +14,7 @@ dampeningFact = 0.0000000001;
 redistPercentage = 0.75;
 sensorNoise = .4; 
 isOrthog = 0;
-
+n = 0;
 particles(numParticles,1) = BotSim;
 for i = 1:numParticles
     particles(i) = BotSim(map); 
@@ -37,26 +37,23 @@ for i = 1:numParticles
     newParticles(i).setBotAng(floor(rand*4)*pi/2);
 end
 
-
-
-prevPow = nxt.pUltra;
-nxt.pUltra = 25;
-scanA = nxt.rotScan(72);
+scanA = nxt.rotScan(numScansFull);
 [angleToTurn, botScan] = orthoScans(scanA);
-%nxt.turn(angletoTurn);
+
 while (sum(botScan < 9) > 0)
-    scanA = nxt.rotScan(72);
+    scanA = nxt.rotScan(numScansFull);
     [angleToTurn, botScan] = orthoScans(scanA);
 end
+
 dangerZone = false;
-if ((40<(botScan(1)+botScan(3)) && (botScan(1)+botScan(3))<50)&&(100<(botScan(2)+botScan(4)) && (botScan(2)+botScan(4))<110))
+
+if ((35<(botScan(1)+botScan(3)) && (botScan(1)+botScan(3))<50)&&(100<(botScan(2)+botScan(4)) && (botScan(2)+botScan(4))<110))
     if (44<botScan(2) && botScan(2)<61)&&(44<botScan(4) && botScan(4)<61)
         dangerZone = true;
     end
 end
-nxt.pUltra = prevPow;
 
-if ((40<(botScan(2)+botScan(4)) && (botScan(2)+botScan(4))<50)&&(100<(botScan(1)+botScan(3)) && (botScan(1)+botScan(3))<110))
+if ((35<(botScan(2)+botScan(4)) && (botScan(2)+botScan(4))<50)&&(100<(botScan(1)+botScan(3)) && (botScan(1)+botScan(3))<110))
     if (44<botScan(1) && botScan(1)<61)&&(44<botScan(3) && botScan(3)<61)
         dangerZone = true;
     end
@@ -71,12 +68,18 @@ end
 if dangerZone == true
     nxt.turn(ang)
     nxt.move(max(botScan)-15)
+    scanA = nxt.rotScan(numScansFull);
+    [angleToTurn, botScan] = orthoScans(scanA);
 end
 
 
 while(converged == 0)
-    scanA = nxt.rotScan(numScansFull);
-    [~, botScan] = orthoScans(scanA);
+    
+    if n > 0
+        scanA = nxt.rotScan(numScansFull);
+        [~, botScan] = orthoScans(scanA);
+    end
+    n = n+1;
     %pause(0.3)
     distances = zeros(size(scanLines,1), numParticles);
     particleProbs = zeros(numParticles,1);
@@ -158,7 +161,7 @@ while(converged == 0)
         if isOrthog == 0
            nxt.turn(angleToTurn);
            isOrthog = 1;
-           scanA = nxt.rotScan(4);
+           scanA = nxt.rotScan(numScansFull);
         end
         if (scanA(1) < 5*move)
             foundRoute = 0;
@@ -227,10 +230,7 @@ botGhost.setMotionNoise(0);
 botGhost.setTurningNoise(0);
 botGhost.setBotPos(estPosition); %spawn the particles in random locations
 botGhost.setBotAng(0);
-prevPow = nxt.pUltra;
-nxt.pUltra = 25;
-orientationScan = nxt.rotScan(numScans);
-nxt.pUltra = prevPow;
+orientationScan = scanA;
 ghostScan = botGhost.ultraScan();
 score = zeros(numScans,1);
 for i = 1:(numScans)

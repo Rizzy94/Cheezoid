@@ -1,9 +1,0 @@
-function nxtScan, botScan = scanAll(nxt, bot, numScans)
-    %1. scan using nxt robot
-    rScan = nxt.rotScan(numScans)
-    %2. figure out the orthogonal scans
-    [ang, rScan] = orthoScans(rScan)
-    %3. Ang gives one orthogonal scan angle, deduce them all:
-    angles = (ang:pi/2:ang+(2*pi))
-    angles = wrapTo2Pi(angles)
-end

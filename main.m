@@ -1,9 +1,12 @@
+clear all
+close all
+
 %% Combining PathPlanning.m and FollowPath.m - probably to be inserted into the full robot script later
 tic
 %% All the setup needed for these two functions
 % map = [0,0;60,0;60,45;45,45;45,59;106,59;106,105;0,105]; %default map
 plotit = 1;
-goalPos = [22,88];
+goalPos = [88,88];
 
 samples = 32;
 lost = 0;
